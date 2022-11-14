@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "0ee387ce-4ad6-498e-89c5-bd07e852eef0": {
+      "ProjectGuid": "0ee387ce-4ad6-498e-89c5-bd07e852eef0",
+      "DisplayName": "algo_sort_selection",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}
