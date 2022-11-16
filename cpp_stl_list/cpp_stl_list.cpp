@@ -68,10 +68,86 @@ int main()
     tpUnit = new CUnit(2);
     tUnitList.push_back(tpUnit);
 
-    list<CUnit*>::iterator tltor;
-    for (tltor = tUnitList.begin(); tltor != tUnitList.end(); ++tltor)
+    list<CUnit*>::iterator tItor;
+    for (tItor = tUnitList.begin(); tItor != tUnitList.end(); ++tItor)
     {
-        cout << "원소의 값" << (*tltor)->GetVal() << endl;
+        cout << "원소의 값" << (*tItor)->GetVal() << endl;
+    }
+
+    //인덱스 접근 연산자는 지원하지 않는다. 링크드 리스트이므로 임의의 접근은 불가능하다.
+    //int tId = tUnitList[0]->GetVal();
+
+    //순차검색 O(n)
+    for (tItor = tUnitList.begin(); tItor != tUnitList.end(); ++tItor)
+    {
+        if (2 == (*tItor)->GetVal())
+        {
+            (*tItor)->SetVal(777);
+            break;
+        }
+    }
+
+    cout << endl;
+    for (tItor = tUnitList.begin(); tItor != tUnitList.end(); ++tItor)
+    {
+        cout << "원소의 값" << (*tItor)->GetVal() << endl;
+    }
+
+    cout << endl;
+
+    //역순으로 순회
+    //stl의 list는 더블링크드리스트로 만들어졌으므로 역순으로 순회가 가능하다, reverse_iterator가 존재한다
+    list<CUnit*>::reverse_iterator tRItor;
+    for (tRItor = tUnitList.rbegin(); tRItor != tUnitList.rend(); ++tRItor)
+    {
+        cout << "원소의 값" << (*tRItor)->GetVal() << endl;
+    }
+
+    cout << endl;
+
+    //순차검색 O(n)
+    for (tItor = tUnitList.begin(); tItor != tUnitList.end();)
+    {
+        if (1 == (*tItor)->GetVal())
+        {
+            if (nullptr != (*tItor))
+            {
+                delete (*tItor);
+            }
+
+            //list의 erase는 다음 이터레이터를 리턴한다.
+            tItor = tUnitList.erase(tItor);
+        }
+        else
+        {
+            ++tItor;
+        }
+    }
+
+    //모두 지우기
+
+    //동적으로 할당된 것들은 모두 삭제해주어야 한다.
+    for (tItor = tUnitList.begin(); tItor != tUnitList.end(); ++tItor)
+    {
+        cout << "원소의 값" << (*tItor)->GetVal() << endl;
+    }
+
+    for (tItor = tUnitList.begin(); tItor != tUnitList.end(); ++tItor)
+    {
+        if (nullptr != (*tItor))
+        {
+            delete (*tItor);
+            (*tItor) = nullptr;
+        }
+    }
+    //리스트의 원소들을 모두 지운다
+    tUnitList.clear();
+
+    cout << endl;
+    cout << "리스트의 원소 표시===" << endl;
+    for (tItor = tUnitList.begin(); tItor != tUnitList.end(); ++tItor)
+    {
+        cout << "원소의 값" << (*tItor)->GetVal() << endl;
     }
 
     return 0;
