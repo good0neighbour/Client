@@ -160,14 +160,28 @@
 // <----------이벤트 드리븐event driven,
 //              메시지message, 메시지루프 Message loop, 윈도우 프로시저 window procedure, 메시지큐Message Queue
 
+//여기서는 '윈도우 프로그램은 이벤트 기반으로 동작한다' 라는 개념을 살펴본다
+//이를 위해 제공되는 '윈도우 프로시저' 개념을 살펴본다
+//
+// "'윈도우 프로시저'를 정의하고 '윈도우클래스 정보'에 설정하였다."
+//
+
+// 윈도우 프로시저의 정의는 window api가 요구하는 형식을 맞춰야만 한다.
+// -------호출은 운영체제가 하기 대문이다-------
+
+//message: 윈도우 메시지 식별자다. WM_접두사가 붙어있다.
+//wParam WORD PARAMETER 32비트응용앱에서는 32비트 크기다.
+//IParam LONG PARAMETER 32비트 크기다
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
-    case WM_PAINT:
+    case WM_PAINT:      //<-- WM_WindowMessage의 의미의 접두사
     {
         PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hWnd, &ps);
+        HDC hdc = BeginPaint(hWnd, &ps);            //hdc device context에 대한 행동
+        //device context 그리기 장치( 그리기에 대한 여러가지 장치와 소프트웨어를 추상화해놓은 것 )
         // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
         EndPaint(hWnd, &ps);
     }
@@ -222,6 +236,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
     //윈도우 핸들hWnd(윈도우 식별자)을 리턴
     HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);//<--CW~ CreateWindow
+    //<-- 여기서 hWnd는 실제 눈에 보이는 윈도우에 대한 식별자다.
+    //즉, 같은 종류라 하더라도 다 따로 있다.
+    //반면에 hInstance는 같은 종류면 하나만 있다.
 
     if (!hWnd)
     {
