@@ -1,0 +1,3 @@
+C:\Users\User\Documents\GitHub\ClientBasic_Weekday\winAPIEngine\x64\Debug\winAPIEngine.exe
+C:\Users\User\Documents\GitHub\ClientBasic_Weekday\winAPIEngine_step_1_inheritance\x64\Debug\winAPIEngine.exe
+C:\Users\User\Documents\GitHub\ClientBasic_Weekday\winAPIEngine_step_2_msgloop\x64\Debug\winAPIEngine.exe
