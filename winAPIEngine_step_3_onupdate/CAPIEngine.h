@@ -23,7 +23,8 @@ public:
 	virtual void OnDestroy();
 	virtual void OnUpdate();
 
-	//void DrawCircle(float tX, float tY, float tRadius);
+	//원그리기 함수
+	void DrawCircle(float tX, float tY, float tRadius);
 
 protected:
 	ATOM MyRegisterClass(HINSTANCE hInstance);

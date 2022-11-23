@@ -101,33 +101,38 @@ void CAPIEngine::OnUpdate()
 {
     //OutputDebugString(L"CAPIEngine::OnUpdate\n");
 
-    //문자열
-    TextOut(mhDC, 0, 0, TEXT("Nationalism"), 11);
-    TextOut(mhDC, 0, 25, TEXT("012345!@#$%^&*()"), 16);
-    TextOut(mhDC, 0, 50, TEXT("안녕하세요."), 6);
+    ////문자열
+    //TextOut(mhDC, 0, 0, TEXT("Nationalism"), 11);
+    //TextOut(mhDC, 0, 25, TEXT("012345!@#$%^&*()"), 16);
+    //TextOut(mhDC, 0, 50, TEXT("안녕하세요."), 6);
+    //
+    //LPCWSTR tszwStr = L"한글 visual studio community";
+    //int tCount = lstrlenW(tszwStr); //wide string에 글자 갯수 세기 함수
+    //TextOut(mhDC, 0, 75, tszwStr, tCount);
+    //
+    ////사각형
+    //Rectangle(mhDC, 200, 200, 200 + 100, 200 + 50);
+    //
+    ////선분 그리기
+    //MoveToEx(mhDC, 550, 200, nullptr);
+    //LineTo(mhDC, 600, 300);
+    //
+    ////삼각형 그리기
+    //MoveToEx(mhDC, 350, 200, nullptr);
+    //LineTo(mhDC, 450, 300);
+    //LineTo(mhDC, 500, 200);
+    //LineTo(mhDC, 350, 200);
+    //
+    ////타원
+    //Ellipse(mhDC, 400, 100, 400 + 100, 100 + 50);
+    //
+    ////원
+    //Ellipse(mhDC, 0, 400, 0 + 100, 400 + 100);
+}
 
-    LPCWSTR tszwStr = L"한글 visual studio community";
-    int tCount = lstrlenW(tszwStr); //wide string에 글자 갯수 세기 함수
-    TextOut(mhDC, 0, 75, tszwStr, tCount);
-
-    //사각형
-    Rectangle(mhDC, 200, 200, 200 + 100, 200 + 50);
-
-    //선분 그리기
-    MoveToEx(mhDC, 550, 200, nullptr);
-    LineTo(mhDC, 600, 300);
-
-    //삼각형 그리기
-    MoveToEx(mhDC, 350, 200, nullptr);
-    LineTo(mhDC, 450, 300);
-    LineTo(mhDC, 500, 200);
-    LineTo(mhDC, 350, 200);
-
-    //타원
-    Ellipse(mhDC, 400, 100, 400 + 100, 100 + 50);
-
-    //원
-    Ellipse(mhDC, 0, 400, 0 + 100, 400 + 100);
+void CAPIEngine::DrawCircle(float tX, float tY, float tRadius)
+{
+    Ellipse(mhDC, tX - tRadius, tY - tRadius, tX + tRadius, tY + tRadius);
 }
 
 ATOM CAPIEngine::MyRegisterClass(HINSTANCE hInstance)
