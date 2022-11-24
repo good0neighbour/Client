@@ -8,8 +8,18 @@
 
 #include "CUnit.h"
 
+#include "CTexture.h"
+
 /*
 * i) '비트맵'을 로드하고 화면에 출력해보자
+* 
+*   비트맵 bitmap: '픽셀pixel' 의 '2차원 배열'의 형태로 표현되는 '이미지 데이터'
+*   픽셀pixel: 색상 데이터
+* 
+*       빛의 삼원색: Red Green Blue
+* 
+*       <-- DDB   Device dependency bitmap    메모리 상에서 두뤄지는 비트맵
+*       <-- DIB   Device independency bitmap  파일 형색의 비트맵
 * 
 * ii) i)의 기능을 클래스화자
 *   CTexture
@@ -18,6 +28,8 @@
 class CRyuEngine : public CAPIEngine
 {
     CUnit* mpUnit = nullptr;
+
+    CTexture* mpTexture = nullptr;
 
 public:
     CRyuEngine() {};
@@ -35,16 +47,19 @@ public:
 
         //todo
         mpUnit = new CUnit();
-        mpUnit->SetPosition(800 * 0.5f, 600 - 50 - 30.0f);
+        mpUnit->SetPosition(800 * 0.5f, 600 - 50 - 100.0f);
         mpUnit->SetRaidus(50.0f);
+
+        mpTexture = new CTexture();
+        mpTexture->LoadTexture(hInst, mhDC, L"resources/bongbong_0.bmp");
     }
     virtual void OnDestroy() override
     {
         //todo
-        if (mpUnit)
+        if (nullptr != mpTexture)
         {
-            delete mpUnit;
-            mpUnit = nullptr;
+            delete mpTexture;
+            mpTexture = nullptr;
         }
 
         CAPIEngine::OnDestroy();
@@ -85,8 +100,66 @@ public:
         //Update Method Pattern: 한 프레임에 일어나는 동작을 함수화하여 게임루프와 결합하여 프로그래밍하는 패턴
         mpUnit->Render(this);
 
+        if (mpTexture)
+        {
+            BitBlt(mhDC,
+                mpUnit->mX, mpUnit->mY,
+                mpTexture->mBitmapInfo.bmWidth, mpTexture->mBitmapInfo.bmHeight,
+                mpTexture->mthDCMem,
+                0, 0,
+                SRCCOPY);
+        }
+
         //todo
         //this->DrawCircle(200.0f, 200.0f, 100.0f);
+
+        //test
+        //window api를 이용하여 비트맵 출력해보기
+
+        //비트맵은 '현재화면DC'에 직접적으로 출력할 수 없다.
+        //<-- 현재화면 DC에 출력할 수 없으므로 현재화면DC와 호환되는 memoryDC를 만들어 그곳에 비트맵을 설정한다
+
+        //비트맵을 현재화면DC에 출력하는 절차
+        // i) memory dc를 만든다.
+        // ii) 비트맵을 로드한다('파일'에서 데이터를 로드하여 '메모리에 생성한다) 리턴값은 '비트맵 핸들'이다.
+        // iii) 비트맵 핸들을 memory dc에 설정한다
+
+        //          그린다.
+        //          <--memoryDC에 설정된 비트맵(픽셀의 2차원 배열로 표시된 이미지 데이터)데이터를 현재화면DC로 복사
+
+        // i)memory dc의 비트맵 핸들 설정을 해제한다
+        // ii)비트맵 핸들을 삭제한다(생성한 비트맵 자원 해제)
+        // iii)memory dc도 삭제한다
+
+        //HDC thDCMem = CreateCompatibleDC(mhDC);  //<--Omemory dc를 만든다.
+
+        //HBITMAP thBitmap = (HBITMAP)LoadImage(hInst, L"resources/bongbong_0.bmp",
+        //    IMAGE_BITMAP,
+        //    0, 0,
+        //    LR_LOADFROMFILE);   //<--LR~ Load Resource
+
+        //HBITMAP  thOldBitmap = (HBITMAP)SelectObject(thDCMem, thBitmap);
+
+        //    //비트맵 정보를 얻어오자
+        //    BITMAP tBitmapInfo;
+        //    GetObject(thBitmap, sizeof(tBitmapInfo), &tBitmapInfo);
+
+        ////비트맵 데이터 전송함수
+        //BitBlt(mhDC,    //현재화면DC
+        //    100, 100,   //<--출력위치
+        //    tBitmapInfo.bmWidth, tBitmapInfo.bmHeight,  //<-- 너비, 높이
+        //    thDCMem,
+        //    0, 0,
+        //    SRCCOPY);
+
+        //SelectObject(thDCMem, thOldBitmap); //이전에 사용하던 비트맵으로 설정을 되돌린다
+        //DeleteObject(thBitmap);
+
+        //DeleteDC(thDCMem);  //memoryDC를 삭제한다
+
+        //현재 화면 DC와는 동작방식이 다르다
+        //현재 화면 DC는 얻어오고, 놓아주는 개념이다.
+        //반면에 여기서 사용하고 있는 memoryDC는 생성하고 해제하는 개념이다.
     }
 };
 

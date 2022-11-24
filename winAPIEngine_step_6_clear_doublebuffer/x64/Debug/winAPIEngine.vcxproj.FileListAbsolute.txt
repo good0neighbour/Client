@@ -1,0 +1,7 @@
+C:\Users\User\Documents\GitHub\ClientBasic_Weekday\winAPIEngine\x64\Debug\winAPIEngine.exe
+C:\Users\User\Documents\GitHub\ClientBasic_Weekday\winAPIEngine_step_1_inheritance\x64\Debug\winAPIEngine.exe
+C:\Users\User\Documents\GitHub\ClientBasic_Weekday\winAPIEngine_step_2_msgloop\x64\Debug\winAPIEngine.exe
+C:\Users\User\Documents\GitHub\ClientBasic_Weekday\winAPIEngine_step_3_onupdate\x64\Debug\winAPIEngine.exe
+C:\Users\User\Documents\GitHub\ClientBasic_Weekday\winAPIEngine_step_4_unit_updatemethod\x64\Debug\winAPIEngine.exe
+C:\Users\User\Documents\GitHub\ClientBasic_Weekday\winAPIEngine_step_5_bitmap\x64\Debug\winAPIEngine.exe
+C:\Users\User\Documents\GitHub\ClientBasic_Weekday\winAPIEngine_step_6_clear_doublebuffer\x64\Debug\winAPIEngine.exe
