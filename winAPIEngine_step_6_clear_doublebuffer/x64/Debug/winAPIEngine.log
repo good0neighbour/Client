@@ -1,1 +1,12 @@
-﻿  CTexture.cpp
+﻿  CAPIEngine.cpp
+C:\GitHub\ClientBasic_Weekday\winAPIEngine_step_6_clear_doublebuffer\CAPIEngine.cpp(149,81): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\GitHub\ClientBasic_Weekday\winAPIEngine_step_6_clear_doublebuffer\CAPIEngine.cpp(149,67): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\GitHub\ClientBasic_Weekday\winAPIEngine_step_6_clear_doublebuffer\CAPIEngine.cpp(149,53): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\GitHub\ClientBasic_Weekday\winAPIEngine_step_6_clear_doublebuffer\CAPIEngine.cpp(149,39): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\GitHub\ClientBasic_Weekday\winAPIEngine_step_6_clear_doublebuffer\CAPIEngine.cpp(155,13): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\GitHub\ClientBasic_Weekday\winAPIEngine_step_6_clear_doublebuffer\CAPIEngine.cpp(155,9): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  CUnit.cpp
+  코드를 생성하고 있습니다...
+C:\GitHub\ClientBasic_Weekday\winAPIEngine_step_6_clear_doublebuffer\CAPIEngine.cpp(31): warning C4715: 'CAPIEngine::Create': 모든 제어 경로에서 값을 반환하지는 않습니다.
+  LINK : C:\GitHub\ClientBasic_Weekday\winAPIEngine_step_6_clear_doublebuffer\x64\Debug\winAPIEngine.exe을(를) 찾을 수 없거나 마지막 증분 링크에 의해 빌드되지 않았습니다. 전체 링크를 수행하고 있습니다.
+  winAPIEngine.vcxproj -> C:\GitHub\ClientBasic_Weekday\winAPIEngine_step_6_clear_doublebuffer\x64\Debug\winAPIEngine.exe
