@@ -2,11 +2,13 @@
 
 #include "SVector2D.h"
 
-class CObjectRyu
+#include "CRef.h"
+
+class CObjectRyu: public CRef
 {
 public:
 	CObjectRyu();
-	~CObjectRyu();
+	virtual ~CObjectRyu();
 
 	CObjectRyu(const CObjectRyu& t);
 	void operator=(const CObjectRyu& t);

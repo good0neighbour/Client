@@ -10,7 +10,7 @@ class CUnit: public CObjectRyu
 {
 public:
 	CUnit();
-	~CUnit();
+	virtual ~CUnit();
 	//복사생성자
 	CUnit(const CUnit& t);
 	//복사대입연산자

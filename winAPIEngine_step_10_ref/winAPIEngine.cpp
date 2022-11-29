@@ -10,15 +10,21 @@
 
 #include "CTexture.h"
 
+//test
+#include <list>
+using namespace std;
+
 /*
 * 여기서는 CUnit에 Pivot기능을 추가해보자
 */
 
 class CRyuEngine : public CAPIEngine
 {
-    CUnit* mpUnit = nullptr;
+    //test
+    //CObjectRyu* testObject = nullptr;
 
     CTexture* mpTexture = nullptr;
+    CUnit* mpUnit = nullptr;
 
 public:
     CRyuEngine() {};
@@ -34,11 +40,22 @@ public:
     {
         CAPIEngine::OnCreate();
 
+        //test
+        //testObject = new CObjectRyu();
+        //testObject->AddRef();
+        //
+        //list<CObjectRyu*> testObjectList;
+        //testObjectList.push_back(testObject);
+        //testObject->AddRef();
+        //
+        //testObject->Release();
+
         //todo
         mpTexture = new CTexture();
         mpTexture->LoadTexture(hInst, mhDC, L"resources/bongbong_0.bmp");
 
         mpUnit = new CUnit();
+        mpUnit->AddRef();
         mpUnit->SetPosition(800 * 0.5f, 600 - 50 - 100.0f);
         mpUnit->SetRaidus(50.0f);
         //pivot
@@ -53,6 +70,18 @@ public:
             delete mpTexture;
             mpTexture = nullptr;
         }
+        if (nullptr != mpUnit)
+        {
+            mpUnit->Release();
+            //delete mpUnit;
+            mpUnit = nullptr;
+        }
+
+        //if (nullptr != testObject)
+        //{
+        //    testObject->Release();
+        //    testObject = nullptr;
+        //}
 
         CAPIEngine::OnDestroy();
     }
