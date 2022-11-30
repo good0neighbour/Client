@@ -18,6 +18,7 @@ public:
 	{
 		mPosition = tPosition;
 	}
+
 	inline SVector2D GetPosition()
 	{
 		return mPosition;

@@ -3,6 +3,8 @@
 #include "Resource.h"
 #include "CTexture.h"
 
+#include "CInputMgr.h"
+
 HINSTANCE CAPIEngine::hInst = nullptr;
 
 
@@ -36,7 +38,6 @@ BOOL CAPIEngine::Create(HINSTANCE hInstance, int nCmdShow)
 //{
 //    OnCreate();     //<--상속구조에 다형성을 이용한다
 //
-//
 //    HACCEL hAccelTable = LoadAccelerators(hInst, MAKEINTRESOURCE(IDC_WINAPIENGINE));
 //
 //    MSG msg = { 0 };    //MSG구조체 타입의 지역변수 초기화
@@ -51,7 +52,6 @@ BOOL CAPIEngine::Create(HINSTANCE hInstance, int nCmdShow)
 //        }
 //    }
 //
-//
 //    OnDestroy();   //<--상속구조에 다형성을 이용한다
 //
 //    return msg;
@@ -60,16 +60,16 @@ BOOL CAPIEngine::Create(HINSTANCE hInstance, int nCmdShow)
 MSG CAPIEngine::Run()
 {
     mhDC = GetDC(mhWnd);            //현재 화면 DC를 얻는다
-                                                    //GetDC는 어디서든 현재 화면  DC를 얻는  window api함수이다.
+                                    //GetDC는 어디서든 현재 화면  DC를 얻는  window api함수이다.
 
     mpBackBuffer = new CTexture();
     mpBackBuffer->CreateBackBuffer(hInst, mhDC);
 
+    CInputMgr::GetInstance();
 
-    OnCreate();     //<--상속구조에 다형성을 이용한다
+    OnCreate();         //<--상속구조에 다형성을 이용한다
 
     MSG msg = { 0 };    //MSG구조체 타입의 지역변수 초기화
-
 
     //'게임 루프game loop'를 고려한 구조로 개조
     //              <--- 게임루프 패턴을 적용했다.
@@ -90,10 +90,9 @@ MSG CAPIEngine::Run()
         }
     }
 
-
     OnDestroy();   //<--상속구조에 다형성을 이용한다
 
-
+    CInputMgr::GetInstance()->ReleaseInstance();
 
     if (nullptr != mpBackBuffer)
     {
@@ -101,28 +100,24 @@ MSG CAPIEngine::Run()
         mpBackBuffer = nullptr;
     }
 
-
-
     ReleaseDC(mhWnd, mhDC);
     
-
     return msg;
 }
-
 
 void CAPIEngine::OnCreate()
 {
     OutputDebugString(L"CAPIEngine::OnCreate\n");
 }
+
 void CAPIEngine::OnDestroy()
 {
     OutputDebugString(L"CAPIEngine::OnDestroy\n");
 }
+
 void CAPIEngine::OnUpdate()
 {
     //OutputDebugString(L"CAPIEngine::OnUpdate\n");
-
-
 
     //문자열
     //TextOut(mhDC, 0, 0, TEXT("Good Boy."), 9);
@@ -132,7 +127,6 @@ void CAPIEngine::OnUpdate()
     //LPCWSTR tszwStr = L"한글판 visual studio community";
     //int tCount = lstrlenW(tszwStr);     //wide string에 글자 갯수 세기 함수
     //TextOut(mhDC, 0, 75, tszwStr, tCount);
-
 
     ////사각형
     //Rectangle(mhDC, 200, 200, 200 + 100, 200 + 50);
@@ -147,14 +141,12 @@ void CAPIEngine::OnUpdate()
     //LineTo(mhDC, 500, 200);
     //LineTo(mhDC, 350, 200);
 
-
     ////타원
     //Ellipse(mhDC, 400, 100, 400 + 100, 100 + 50);
 
     ////원
     //Ellipse(mhDC, 0, 400, 0 + 100, 400 + 100);
 }
-
 
 void CAPIEngine::DrawCircle(float tX, float tY, float tRadius)
 {
@@ -196,9 +188,6 @@ void CAPIEngine::Clear(float tR, float tG, float tB)
     //이제 후면버퍼에 그린다.
     //Rectangle(mpBackBuffer->mhDCMem, 0, 0, tRect.right, tRect.bottom);
 
-
-
-
     //step_1
     // GDI( Graphic Device Interace ) Object
     //Pen 외곽선을 그리는 도구이다.
@@ -229,6 +218,7 @@ void CAPIEngine::Clear(float tR, float tG, float tB)
     DeleteObject(hPen);
 
 }
+
 //double buffer pattern을 적용
 void CAPIEngine::Present()
 {
@@ -239,11 +229,6 @@ void CAPIEngine::Present()
         0, 0,
         SRCCOPY);
 }
-
-
-
-
-
 
 ATOM CAPIEngine::MyRegisterClass(HINSTANCE hInstance)
 {
@@ -289,8 +274,6 @@ BOOL CAPIEngine::InitInstance(HINSTANCE hInstance, int nCmdShow)
     //새롭게 갱신된 window rect 데이터를 가지고 윈도우의 위치를 지정하자
     SetWindowPos(hWnd, HWND_TOPMOST, 0,0, tRect.right - tRect.left, tRect.bottom - tRect.top, 
         SWP_NOMOVE | SWP_NOZORDER) ;
-
-
 
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
@@ -346,7 +329,6 @@ LRESULT CALLBACK CAPIEngine::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPA
         //int tCount = lstrlenW(tszwStr);     //wide string에 글자 갯수 세기 함수
         //TextOut(hdc, 0, 75, tszwStr, tCount);
 
-
         ////사각형
         //Rectangle(hdc, 200, 200, 200 + 100, 200 + 50);
 
@@ -360,13 +342,11 @@ LRESULT CALLBACK CAPIEngine::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPA
         //LineTo(hdc, 500, 200);
         //LineTo(hdc, 350, 200);
 
-
         ////타원
         //Ellipse(hdc, 400, 100, 400 + 100, 100 + 50);
 
         ////원
         //Ellipse(hdc, 0, 400, 0 + 100, 400 + 100);
-
 
         EndPaint(hWnd, &ps);            //DC를 해제
     }

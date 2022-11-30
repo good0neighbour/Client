@@ -58,7 +58,6 @@ void CUnit::operator=(const CUnit& t)
 	mWidth = t.mWidth;
 	mHeight = t.mHeight;
 
-
 	//얕은 복사
 	//비트맵 이미지 데이터는 shared resource(공유자원)로 다루겠다.
 	//어차피 같은 외관을 가지는 비행기들이므로.
@@ -86,8 +85,6 @@ void CUnit::Render(CAPIEngine* tpEngine)
 	mDisplayY = mPosition.mY - mHeight * mAnchorY;
 
 	tpEngine->DrawTexture(mDisplayX, mDisplayY, mpTexture);
-
-
 
 	//DEBUG DRAW
 	//tpEngine->DrawCircle(mX, mY, mRadius);

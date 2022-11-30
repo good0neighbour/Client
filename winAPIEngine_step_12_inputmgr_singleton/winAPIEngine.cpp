@@ -10,13 +10,23 @@
 
 #include "CTexture.h"
 
+#include "ryumacro.h"
+
 //test
 #include <list>
 using namespace std;
 
 /*
-    여기서는 CUnit에 Pivot기능을 추가해보자
-    
+* 이번 예시에서는
+* input 관리자를 만들도록 하자.
+*
+* CInputMgr 클래스를 추가하고
+*	singleton 패턴을 적용하도록 한다.
+*
+* i) singleton pattern을 적용하여 CInputMgr클래스를 작성한다
+*
+* ii) 매크로 함수를 이용하여 코드량을 줄여본다.
+* ( 다른 클래스에서도 싱글턴 패턴을 적용하는 것을 가정 )
 */
 
 class CRyuEngine : public CAPIEngine
@@ -41,6 +51,18 @@ public:
     virtual void OnCreate() override
     {
         CAPIEngine::OnCreate();
+
+        //test
+        RYU_INT tA = 3;
+        RYU_INT tB = 2;
+        RYU_INT tResult = 0;
+
+        tResult = tA + tB;
+
+        char tszTemp[256] = { 0 };  //c style 문자열
+        sprintf_s(tszTemp, "tResult: %d\n", tResult);
+        OutputDebugStringA(tszTemp);
+        //~A가 붙은 OutputDebugString은 아스키코드용
 
             //test
             //testObject = new CObjectRyu();
@@ -70,11 +92,14 @@ public:
 
     virtual void OnDestroy() override
     {
-        if (nullptr != mpTexture)
+        /*if (nullptr != mpTexture)
         {
             delete mpTexture;
             mpTexture = nullptr;
-        }
+        }*/
+        //매크로 함수를 사용하여
+        //호출하는 측의 코드가 간략화되었다.
+        SAFE_DELETE(mpTexture)
 
         //todo
         if (nullptr != mpUnit)
@@ -122,8 +147,10 @@ public:
             //순수한 방향의 속도 설정 (-1,0)
             tVelocity.mX = -1.0f;
             tVelocity.mY = 0.0f;
-            
+
             mpUnit->SetVelocity(tVelocity * 0.1f);
+            
+            OutputDebugString(L"key input A\n");
         }        
         if (GetAsyncKeyState('D') & 0x8000) 
         {
@@ -133,6 +160,12 @@ public:
             tVelocity.mY = 0.0f;
             
             mpUnit->SetVelocity(tVelocity * 0.1f);
+
+            OutputDebugString(L"key input D\n");
+        }        
+        if (GetAsyncKeyState(VK_SPACE) & 0x8000) 
+        {
+            OutputDebugString(L"Fire Bullet............VK_SPACE\n");
         }
 
         mpUnit->Update();
