@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ryumacro.h"
+
 /*
 *	구조화 프로그래밍 structured programming
 *	:함수와 구조체 등의 구조를 만들어 프로그램 구조를 작성하는 방법론
@@ -21,18 +23,23 @@
 * ii) 생성자는 public이 아니다.
 * iii) GetInstance()함수의 정의에는 객체의 최대 생성갯수를 1개로 제한하는 판단제어구조를 위치시킨다
 */
+
+//class CInputMgr
+//{
+//private:
+//	static CInputMgr* mpInstance;// = nullptr;
+//
+////public:
+//private:
+//	CInputMgr();
+//	~CInputMgr();
+//
+//public:
+//	static CInputMgr* GetInstance();
+//	static void ReleaseInstance();
+//};
+
 class CInputMgr
 {
-private:
-	static CInputMgr* mpInstance;// = nullptr;
-
-//public:
-private:
-	CInputMgr();
-	~CInputMgr();
-
-public:
-	static CInputMgr* GetInstance();
-	static void ReleaseInstance();
+	SINGLETON_DECLARE(CInputMgr)
 };
-

@@ -19,14 +19,19 @@ using namespace std;
 /*
 * 이번 예시에서는
 * input 관리자를 만들도록 하자.
-*
-* CInputMgr 클래스를 추가하고
-*	singleton 패턴을 적용하도록 한다.
-*
-* i) singleton pattern을 적용하여 CInputMgr클래스를 작성한다
-*
-* ii) 매크로 함수를 이용하여 코드량을 줄여본다.
-* ( 다른 클래스에서도 싱글턴 패턴을 적용하는 것을 가정 )
+* CInputMgr에 다음 두 가지 기능을 만들자.
+* 
+* i) '추상화된 이름'
+* 과
+* '실제 키입력'
+* 을 매핑시켜
+* 
+* 코드 상에서는
+* '추상화된 이름'으로
+* 표현되게 하자.
+* 
+* ii) 실제 키입력에 대한 여러 상태 처리( Down, Press, Up )를
+* 보다 쉽게 사용하기 위한 구조를 만들자.
 */
 
 class CRyuEngine : public CAPIEngine
@@ -141,7 +146,7 @@ public:
         //A키가 눌리고 있다면
         SVector2D tVelocity;
         mpUnit->SetVelocity(tVelocity);
-        if (GetAsyncKeyState('A') & 0x8000)     
+        if (GetAsyncKeyState('A') & 0x8000)
         {
             //'오일러 축차적 적분법' 에 의한 위치 이동 코드
             //mpUnit->mPosition.mX = mpUnit->mPosition.mX - 0.1f;
@@ -153,7 +158,7 @@ public:
             
             OutputDebugString(L"key input A\n");
         }        
-        if (GetAsyncKeyState('D') & 0x8000) 
+        if (GetAsyncKeyState('D') & 0x8000)
         {
             //mpUnit->mPosition.mX = mpUnit->mPosition.mX + 0.1f;
             //순수한 방향의 속도 설정 (+1,0)
