@@ -40,6 +40,7 @@
 #include "ryumacro.h"
 #include <string>
 #include <unordered_map> //해쉬 자료구조를 컨테이너로 만든 것
+#include <vector>//가변배열
 
 #include <typeinfo>//typeid연산자 사용하기 위해
 using namespace std;
@@ -47,7 +48,8 @@ using namespace std;
 struct SKeyInfo
 {
 	string mStrName = "";	//추상화된 키입력 이름
-	DWORD mKeyInput = 0;	//실제 입력
+	//DWORD mKeyInput = 0;	//실제 입력
+	vector<DWORD> mKeyInputs;//실제 입력들
 
 	bool mIsDown = false;	//처음 눌렸는지 여부
 	bool mIsPress = false;	//눌리고 있는 중인지 여부
@@ -62,6 +64,9 @@ class CInputMgr
 private:
 	//해쉬테이블, O(1)검색속도를 가진다. '키/값' 쌍의 데이터를 다룬다
 	unordered_map<string, SKeyInfo*> mMapKeys; //입력정보들을 담아둘 자료구조
+
+	//템플릿 가변인자 base case함수에서의 처리를 위해 클래스 영역에서 유효하도록 멤버변수화
+	SKeyInfo* mpKeyInfo = nullptr;
 
 private:
 	SKeyInfo* FindKey(const string& tStrKey) const;	//임의의 입력정보 검색, 검색키는 문자열 타입
@@ -78,30 +83,82 @@ public:
 
 	//char, int 두 타입에 대해 모두 작동시키기 위해 '탬플릿 문법을' 이용
 	//탬플릿이므로 '헤더'에 만듦
+	//template<typename T>
+	//bool AddKey(const string& tInputName, const T& tData)
+	//{
+	//	SKeyInfo* tpInfo = nullptr;
+	//	tpInfo = new SKeyInfo();
+
+	//	//typeid연산자: 임의의 타입에 대한 정보를 얻는다
+	//	//타입의 이름을 얻자
+	//	const char* tpType = typeid(T).name();
+
+	//	//strcmp C의 문자열 비교 함수, 같으면 0을 리턴
+	//	if (0 == strcmp("char", tpType) || 0 == strcmp("int", tpType))
+	//	{
+	//		tpInfo->mKeyInput = (DWORD)tData;	//실제 입력을 저장해둔다
+	//	}
+	//	else
+	//	{
+	//		return false;
+	//	}
+
+	//	tpInfo->mStrName = tInputName;	//추상화된 입력 이름 설정
+
+	//	//이제 구축된 입력 데이터를 자료구조에 담는다
+	//	mMapKeys.insert(make_pair(tpInfo->mStrName, tpInfo));
+
+	//	return true;
+	//}
+
+
+	//템플릿 가변인자 함수의 base case 함수
 	template<typename T>
-	bool AddKey(const string& tInputName, const T& tData)
+	bool AddKey(const T& tData)
 	{
-		SKeyInfo* tpInfo = nullptr;
-		tpInfo = new SKeyInfo();
+		const char* tpType = typeid(T).name();
+
+		if (0 == strcmp("char", tpType) || 0 == strcmp("int", tpType))
+		{
+			//mpKeyInfo->mKeyInput = (DWORD)tData;	//실제 입력을 저장해둔다
+			mpKeyInfo->mKeyInputs.push_back((DWORD)tData);
+		}
+
+		return true;
+	}
+
+	//템플릿 가변인자
+	template<typename T, typename... Types>
+	bool AddKey(const T& tData, const Types&... arg)
+	{
+		//재귀호출되므로 한번만 만들자
+		if (nullptr == mpKeyInfo)
+		{
+			mpKeyInfo = new SKeyInfo();
+		}
 
 		//typeid연산자: 임의의 타입에 대한 정보를 얻는다
 		//타입의 이름을 얻자
 		const char* tpType = typeid(T).name();
-
-		//strcmp 문자열 비교 함수
+		//strcmp C의 문자열 비교 함수, 같으면 0을 리턴
 		if (0 == strcmp("char", tpType) || 0 == strcmp("int", tpType))
 		{
-			tpInfo->mKeyInput = (DWORD)tData;	//실제 입력을 저장해둔다
+			mpKeyInfo->mKeyInputs.push_back((DWORD)tData);
 		}
-		else
+		else//문자열이면
 		{
-			return false;
+			mpKeyInfo->mStrName = tData; //tInputName;	//추상화된 입력 이름 설정
+
+			mMapKeys.insert(make_pair(mpKeyInfo->mStrName, mpKeyInfo));
 		}
 
-		tpInfo->mStrName = tInputName;	//추상화된 입력 이름 설정
+		//여기서 재귀호출이 일어난다.
+		AddKey(arg...);
 
-		//이제 구축된 입력 데이터를 자료구조에 담는다
-		mMapKeys.insert(make_pair(tpInfo->mStrName, tpInfo));
+		if (nullptr != mpKeyInfo)
+		{
+			mpKeyInfo = nullptr;
+		}
 
 		return true;
 	}

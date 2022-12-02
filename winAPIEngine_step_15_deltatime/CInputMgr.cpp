@@ -52,13 +52,18 @@ void CInputMgr::Update()
 	{
 		//임의의 입력에 대해 눌림이 있는지 검토
 		int tPushCount = 0;
-		if (GetAsyncKeyState(tItor->second->mKeyInput) & 0x8000)
+		for (int ti = 0; ti < tItor->second->mKeyInputs.size(); ++ti)
 		{
-			++tPushCount;	//눌림이 있다면 해당입력에 대해 카운트 하나 증가
+			if (GetAsyncKeyState(tItor->second->mKeyInputs[ti]) & 0x8000)
+			{
+				++tPushCount;	//눌림이 있다면 해당입력에 대해 카운트 하나 증가
+			}
 		}
 
 		//해당 입력에 대해 눌림이 있다
-		if (tPushCount == 1)
+		//if (tPushCount == 1)
+		//키입력이 여러개임을 고려, 키조합의 키갯수만큼, 즉 키조합 '입력'에 대해
+		if (tPushCount == tItor->second->mKeyInputs.size())
 		{
 			//down도 아니고 press도 아니다 ----> 처음 눌린 것이다.
 			if (!tItor->second->mIsDown && !tItor->second->mIsPress)

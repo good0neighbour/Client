@@ -19,21 +19,10 @@
 using namespace std;
 
 /*
-* 이번 예시에서는
-* input 관리자를 만들도록 하자.
-* CInputMgr에 다음 두 가지 기능을 만들자.
+* 이번 예시에서는 '시간 기반 진행'을 위한 구조를 작성해보자.
 * 
-* i) '추상화된 이름'
-* 과
-* '실제 키입력'
-* 을 매핑시켜
+*   프레임 기반 진행 vs 시간 기반 진행
 * 
-* 코드 상에서는
-* '추상화된 이름'으로
-* 표현되게 하자.
-* 
-* ii) 실제 키입력에 대한 여러 상태 처리( Down, Press, Up )를
-* 보다 쉽게 사용하기 위한 구조를 만들자.
 */
 
 class CRyuEngine : public CAPIEngine
@@ -54,7 +43,6 @@ private:
     CRyuEngine& operator=(const CRyuEngine& t) = delete;
 
 public:
-
     virtual void OnCreate() override
     {
         CAPIEngine::OnCreate();
@@ -97,6 +85,8 @@ public:
         CInputMgr::GetInstance()->AddKey("OnMoveLt", 'A');
         CInputMgr::GetInstance()->AddKey("OnMoveRt", 'D');
         CInputMgr::GetInstance()->AddKey("OnFire", VK_SPACE);
+
+        CInputMgr::GetInstance()->AddKey("OnTest", VK_LCONTROL, 'H');
     }
 
     virtual void OnDestroy() override
@@ -189,27 +179,34 @@ public:
             //순수한 방향의 속도 설정 (-1,0)
             tVelocity.mX = -1.0f;
             tVelocity.mY = 0.0f;
-
+        
             mpUnit->SetVelocity(tVelocity * 0.1f);
-
+        
             OutputDebugString(L"key input A\n");
         }
+
         if (CInputMgr::GetInstance()->KeyPress("OnMoveRt"))
         {
             //mpUnit->mPosition.mX = mpUnit->mPosition.mX + 0.1f;
             //순수한 방향의 속도 설정 (+1,0)
             tVelocity.mX = +1.0f;
             tVelocity.mY = 0.0f;
-
+        
             mpUnit->SetVelocity(tVelocity * 0.1f);
-
+        
             OutputDebugString(L"key input D\n");
         }
+
         if (CInputMgr::GetInstance()->KeyUp("OnFire"))
         {
             OutputDebugString(L"Fire Bullet............VK_SPACE\n");
         }
 
+        if (CInputMgr::GetInstance()->KeyUp("OnTest"))
+        {
+            OutputDebugString(L"Fire Bullet............VK_LCONTROL  'H'\n");
+        }
+        
         mpUnit->Update();
 
         //render
