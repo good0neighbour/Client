@@ -69,5 +69,10 @@ private:
 	
 	//외관을 나타낼 비트맵 데이터
 	CTexture* mpTexture = nullptr;
+
+public:
+	//순수 가상 함수
+	//clone이라는 형태로 형태를 강제하여 구현하는 것이다
+	virtual CObjectRyu* clone() = 0;
 };
 

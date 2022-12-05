@@ -1,23 +1,4 @@
 ﻿// winAPIEngine.cpp : 애플리케이션에 대한 진입점을 정의합니다.
-// 현재위치 = 이전위치 + 속도 * 시간간격
-// this->mPosition = this->mPosition + mVelocity;
-// 
-// 시간간격<---- 1프레임
-// 
-// 프레임 기반으로 진행되는 게임 월드에서의 속도 예
-// 
-// 초당 프레임
-// : 1초에 프레임 갯수가 몇개이냐
-// 
-// 현재위치 = 이전위치 + 50 * 1프레임
-// 
-// Frames per second
-// 
-// 예) 10fps
-//      1초에 50 * 10 = 500
-// 
-// 예) 100fps
-//      1초에 50 * 100 = 5000
 //
 
 #include "framework.h"
@@ -33,52 +14,29 @@
 
 #include "CInputMgr.h"
 
+#include "CActor.h"
+
 //test
 #include <list>
 using namespace std;
 
 /*
 * 이번 예시에서는
-* '시간 기반 진행'을 위한 구조를
-* 작성해보자.
+* '프로토타입 패턴'을 적용해보기로 한다. <-- 객체 생성 문제에 관한 패턴 중 하나다.
 * 
-*   프레임 기반 진행 vs 시간 기반 진행
+* Prototype Pattern
 * 
-* 프레임 기반 진행의 문제점<--- 컴퓨터의 성능에 따라 게임 월드의 진행 속도가 달라진다
-* ---> 실제 시간 기반 진행
+*   Prefab 원본객체
+*   라는 개념을 만들고
 * 
-* <--- 시간 기반 진행 으로 만드려면 무슨 개념이 필요한가?
-*   ---> N프레임 : 1초 = 1프레임 : x초
-*   x = 1/N( 여기서 N은 초당 프레임 )
-*   즉, 실제 시간기반으로 진행하려면 시간 간격의 기준이 프레임이 아니라
-*   1초를 잘게 쪼갠 실제 시간이 필요하다.
-*   -->즉, '한 프레임에 걸리는 시간'을 측정하면 된다.
+*   이것을 '복제'하여
+*   새로운 객체를 생성하는 형태를 취하는 패턴
 * 
-* 예) 초당프레임이 10fps인 시스템이 있다면
-*       pos = pos + 50 * (1 / 10)
+*   clone()함수를 만드는 특징이 드러난다.
 * 
-*       50 * (1 / 10) * 10 = 50 <--1초에 실제로 진행된 수치
-* 
-*   초당프레임이 100fps인 시스템이 있다면
-*       pos = pos + 50 * (1 / 100)
-* 
-*       50 * (1 / 100) * 100 = 50 <--1초에 실제로 진행된 수치
-* 
-*   --------------------------------------------
-* 
-*   TimeTick :시스템이 구동되고 나서부터 시스템은 일정 카운트를 센다. 이것을 tick이라고 한다.
-*   <-- 이 tick을 가지고 시간측정을 하자.
-* 
-*   timeGetTime()
-*   GetTickCount()
-* 
-*   <-- 정밀도가 1/1000초 정도이다. 이것은 비교적 부정확하므로 사용하지 않겠다.
-*   --> 클럭 장치에 의해 틱을 센다
-* 
-*   QueryPerformanceCounter
-* 
-*   <-- 정밀도가 1/1,000,000초 정도이다. 이것은 비교적 정확하므로 이것을 사용하겠다.
-*   --> CPU의 주파수에 기반하여 틱을 센다
+* 프로토타입 패턴의 목적
+* i)임의의 데이터 값들을 가지는 객체를 '손쉽게' 만들어내는 것이 가능하다 <--이게 가장 주요한 목적
+* ii)또한, 객체를 생성하는 부분의 코드를 보다 일반화하여 표현하는 것이 가능하다.
 */
 
 class CRyuEngine : public CAPIEngine
@@ -86,8 +44,11 @@ class CRyuEngine : public CAPIEngine
     //test
     //CObjectRyu* testObject = nullptr;
 
+    //원본 객체( 주인공 기체의 원본 객체 )
+    CUnit* PFActor = nullptr;
+
     CTexture* mpTexture = nullptr;
-    CUnit* mpUnit = nullptr;
+    CActor* mpActor = nullptr;
 
 public:
     CRyuEngine() {};
@@ -129,13 +90,17 @@ public:
         mpTexture = new CTexture();
         mpTexture->LoadTexture(hInst, mhDC, L"resources/bongbong_0.bmp");
 
-        mpUnit = new CUnit();
-        mpUnit->AddRef();//
-        mpUnit->SetPosition(800 * 0.5f, 600 - 50 - 100.0f);
-        mpUnit->SetRadius(50.0f);
+        //원본객체(주인공 기체에 대한 원본 객체 ) 생성
+        PFActor = new CActor();
+        PFActor->SetPosition(800 * 0.5f, 600 - 50 - 100.0f);
+        PFActor->SetRadius(50.0f);
         //pivot
-        mpUnit->SetAnchorPoint(0.5f, 0.5f);
-        mpUnit->SetTexture(mpTexture);
+        PFActor->SetAnchorPoint(0.5f, 0.5f);
+        PFActor->SetTexture(mpTexture);
+
+        //실제 객체 생성
+        mpActor = static_cast<CActor*>(PFActor->clone());   //원본객체를 복제하여 객체를 생성
+        mpActor->AddRef();
 
         //입력 매핑 등록
         CInputMgr::GetInstance()->AddKey("OnMoveLt", 'A');
@@ -163,7 +128,11 @@ public:
             //delete mpUnit;
             mpUnit = nullptr;
         }*/
-        SAFE_RELEASE(mpUnit);
+        //실제 객체 소멸
+        SAFE_RELEASE(mpActor)
+
+        //원본 객체 소멸
+        SAFE_DELETE(PFActor)
 
         //if (nullptr != testObject)
         //{
@@ -227,7 +196,7 @@ public:
         //mpUnit->Update();
 
         SVector2D tVelocity;
-        mpUnit->SetVelocity(tVelocity);
+        mpActor->SetVelocity(tVelocity);
         if (CInputMgr::GetInstance()->KeyPress("OnMoveLt"))
         {
             //'오일러 축차적 적분법' 에 의한 위치 이동 코드
@@ -237,7 +206,7 @@ public:
             tVelocity.mY = 0.0f;
         
             //mpUnit->SetVelocity(tVelocity * 0.1f);
-            mpUnit->SetVelocity(tVelocity * 350.0f);    //초당 350PIXEL
+            mpActor->SetVelocity(tVelocity * 350.0f);    //초당 350PIXEL
         
             OutputDebugString(L"key input A\n");
         }
@@ -250,7 +219,7 @@ public:
             tVelocity.mY = 0.0f;
         
             //mpUnit->SetVelocity(tVelocity * 0.1f);
-            mpUnit->SetVelocity(tVelocity * 350.0f);    //초당 350PIXEL
+            mpActor->SetVelocity(tVelocity * 350.0f);    //초당 350PIXEL
         
             OutputDebugString(L"key input D\n");
         }
@@ -266,12 +235,12 @@ public:
         }
         
         //시간기반진행
-        mpUnit->Update(tDeltaTime);
+        mpActor->Update(tDeltaTime);
 
         //render
         this->Clear(0.1f, 0.1f, 0.3f);        
         
-        mpUnit->Render(this);
+        mpActor->Render(this);
                 
         this->Present();
     }
