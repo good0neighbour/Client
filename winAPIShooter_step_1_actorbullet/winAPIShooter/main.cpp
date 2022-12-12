@@ -26,35 +26,15 @@ using namespace std;
 #pragma comment(lib, "winAPIEngine.lib")
 
 /*
-* 컴파일 compile: source code file을 object file로 만드는 것
-* 링킹 linking: 서로 다른 파일에 존재하는 프로그램의 부품(함수, 변수)등의 연결을 짓는 작업
+* 이번 예시에서는 다음의 사항들을 만들어보자.
 * 
-* 분할 컴파일: 클래스 등의 부품 단위로 소스코드 파일을 분리하여 작성하고 컴파일하는 것
-* 분할 컴파일의 목적
-*   i) 전체 빌드 시간을 단축하기 위해서 <--원래 주요 목적
-*   ii) 파일 단위로 나눈면 작업 분담하기 좋다.
+* i) CUnit에 활성, 비활성 변수 추가
 * 
-* ============================================================
-*                          빌드 build
-* ============================================================
-*      전처리단계       컴파일       링킹
-*      (텍스트 치환)
-*      매크로 문법
-*            ----> *.cpp ----> *.obj ----> *.exe              ---> 실행run
-*            ----> *.cpp ----> *.obj       *.lib
-*            ...                           *.dll
-*            ----> *.cpp ----> *.obj
+* ii) 주인공 기체의 일반탄환 발사
 * 
-*                              *.lib                               *.dll
-* ============================================================
+* iii) 연사
 * 
-* exe: 실행파일.   자체적으로 메모리로 올려서 실행이 가능한 프로그램 파일
-* 
-* lib: static library 파일        <-- 쉽게 이야기하면 클래스, 함수, 변수 등등이 들어있는 '바이너리 단위의 재사용' 모듈
-* dll: dynamic link library 파일  <-- 쉽게 이야기하면 클래스, 함수, 변수 등등이 들어있는 '바이너리 단위의 재사용' 모듈
-* 
-* lib <-- 컴파일 타임에 링킹된다. 정적static 링크 라이브러리 파일
-* dll <-- 런 타임에 링킹된다. 다이나믹dynamic 링크 라이브러리 파일
+* iv) 주인공 기체의 좌우 경계처리
 */
 
 class CRyuEngine : public CAPIEngine
@@ -141,6 +121,8 @@ public:
         {
             tpBullet = InstantObject<CBullet>(PFBullet);   //원본객체를 복제하여 객체를 생성
             tpBullet->AddRef();
+
+            tpBullet->SetIsActive(false);   //탄환 객체들은 비활성으로 생성
 
             mBullets.push_back(tpBullet);
             tpBullet->AddRef();
@@ -278,12 +260,12 @@ public:
         //render
         this->Clear(0.1f, 0.1f, 0.3f);        
         
-        mpActor->Render(this);
+        mpActor->Render();
 
         vector<CBullet*>::iterator tItor;
         for (tItor = mBullets.begin(); tItor != mBullets.end(); ++tItor)
         {
-            (*tItor)->Render(this);
+            (*tItor)->Render();
         }
                 
         this->Present();
