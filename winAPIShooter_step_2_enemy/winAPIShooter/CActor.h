@@ -11,7 +11,7 @@ class CActor: public CUnit
 {
 public:
 	CActor();
-	~CActor();
+	virtual ~CActor();
 
 	CActor(const CActor& t);
 	void operator=(const CActor& t);

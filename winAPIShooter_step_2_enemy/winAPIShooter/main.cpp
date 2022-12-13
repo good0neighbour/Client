@@ -16,6 +16,7 @@
 
 #include "CActor.h"
 #include "CBullet.h"
+#include "CEnemy.h"
 
 //test
 #include <list>
@@ -28,23 +29,13 @@ using namespace std;
 /*
 * 이번 예시에서는 다음의 사항들을 만들어보자.
 * 
-* i) CUnit에 활성, 비활성 변수 추가
+* i) 적 기체 생성
 * 
-* ii) 주인공 기체의 "'일반탄환' 발사"
+*   CEnemy클래스
 * 
-*   제작 시 정해진 방향으로 발사되는 탄환을 '일반탄환'이라 칭하겠다.
-*   주인공 기체의 일반탄환은 '윗쪽 방향'으로 '발사'된다.
-*   ( 윈도우 좌표계를 사용하고 있으므로 y축 음의 방향이다 )
+* ii) 적 기체 일반탄환 발사
 * 
-*   발사 루틴
-*   //  탄환 발사
-*   // i) 탄환의 '발사 시작 지점'을 설정한다
-*   // ii) 탄환의 '속도'를 설정한다
-*   // iii) 탄환을 '활성화'시킨다
-* 
-* iii) 연사
-* 
-* iv) 주인공 기체의 좌우 경계처리
+* iii) 적 기체 좌우 이동, 좌우 경계 처리
 */
 
 class CRyuEngine : public CAPIEngine
@@ -55,14 +46,19 @@ class CRyuEngine : public CAPIEngine
     //자원resource
     CTexture* mpTexture = nullptr;
     CTexture* mpTexBullet = nullptr; //탄환 비트맵 이미지 데이터 지원
+    CTexture* mpTexEnemy = nullptr; //적 비트맵 데이터 지원
 
+    //prefab
     //원본 객체( 주인공 기체의 원본 객체 )
     CUnit* PFActor = nullptr;
     CUnit* PFBullet = nullptr;  //탄환 원본 객체
+    CUnit* PFEnemy = nullptr;  //적 원본 객체
 
     //object
     CActor* mpActor = nullptr;
     vector<CBullet*> mBullets;  //실제 주인공 기체가 사용할 탄환 객체들
+
+    CEnemy* mpEnemy = nullptr;  //적 기체
 
 public:
     CRyuEngine() {};
@@ -108,6 +104,9 @@ public:
         mpTexBullet = new CTexture();
         mpTexBullet->LoadTexture(hInst, mhDC, L"resources/bongbullet.bmp");
 
+        mpTexEnemy = new CTexture();
+        mpTexEnemy->LoadTexture(hInst, mhDC, L"resources/bongenemy.bmp");
+
         //원본객체(주인공 기체에 대한 원본 객체 ) 생성
         //PFActor = new CActor();
         //PFActor->SetPosition(800 * 0.5f, 600 - 50 - 100.0f);
@@ -118,6 +117,8 @@ public:
         PFActor = CreatePrefab<CActor>(mpTexture, 0.5f, 0.5f, SVector2D(800 * 0.5f, 600 - 50 - 100.0f));
 
         PFBullet = CreatePrefab<CBullet>(mpTexBullet, 0.5f, 0.5f, SVector2D(800 * 0.5f, 600 - 50 - 100.0f));
+
+        PFEnemy = CreatePrefab<CEnemy>(mpTexEnemy, 0.5f, 0.5f, SVector2D(800 * 0.5f, 100.0f));
 
         //실제 객체 생성
         //mpActor = static_cast<CActor*>(PFActor->clone());   //원본객체를 복제하여 객체를 생성
@@ -141,6 +142,9 @@ public:
             tpBullet = nullptr;
         }
 
+        mpEnemy = InstantObject<CEnemy>(PFEnemy);   //원본객체를 복제하여 객체를 생성
+        mpEnemy->AddRef();
+
         //입력 매핑 등록
         CInputMgr::GetInstance()->AddKey("OnMoveLt", 'A');
         CInputMgr::GetInstance()->AddKey("OnMoveRt", 'D');
@@ -151,6 +155,8 @@ public:
 
     virtual void OnDestroy() override
     {
+        DestroyObject<CEnemy>(mpEnemy);
+
         //실제 객체 소멸
         vector<CBullet*>::iterator tItor;
         for (tItor = mBullets.begin(); tItor != mBullets.end(); ++tItor)
@@ -161,12 +167,14 @@ public:
         DestroyObject<CActor>(mpActor);
 
         //원본 객체 소멸
+        DestroyPrefab(PFEnemy);
         DestroyPrefab(PFBullet);
         DestroyPrefab(PFActor);
         
         //자원 해제
         //매크로 함수를 사용하여
         //호출하는 측의 코드가 간략화되었다.
+        SAFE_DELETE(mpTexEnemy)
         SAFE_DELETE(mpTexBullet)
         SAFE_DELETE(mpTexture)
         
@@ -274,6 +282,8 @@ public:
             (*tItor)->Update(tDeltaTime);
         }
 
+        mpEnemy->Update(tDeltaTime);
+
         //render
         this->Clear(0.1f, 0.1f, 0.3f);        
         
@@ -283,6 +293,7 @@ public:
         {
             (*tItor)->Render();
         }
+        mpEnemy->Render();
                 
         this->Present();
     }
