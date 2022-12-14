@@ -18,6 +18,8 @@
 #include "CBullet.h"
 #include "CEnemy.h"
 
+#include "config.h"
+
 //test
 #include <list>
 using namespace std;
@@ -34,6 +36,22 @@ using namespace std;
 *   CEnemy클래스
 * 
 * ii) 적 기체 일반탄환 발사
+* 
+*       일반탄환 한발
+* 
+*       연사 <--'타이머' 기능이 필요하다.
+* 
+*           가) window api 에서 제공하는 타이머를 간단히 살펴보자
+*               다음과 같은 문제점 발견
+*               <-- 정밀도가 낮다
+*               <-- 게임 프로그램 구조를 객체지향으로 처리하는데 문제가 있다.
+* 
+*           우리는 이미 시간측정을 좀더 정밀하게 하고 있다.
+*           나) deltatime 개념을 이용하여 타이머를 직접 제작하도록 하자.
+* 
+*               deltaTime을 누적하여
+                의도하는 일정 시간 간격이 되었는지 판단하는 형태로
+*               타이머를 작성하겠다.
 * 
 * iii) 적 기체 좌우 이동, 좌우 경계 처리
 */
@@ -59,6 +77,7 @@ class CRyuEngine : public CAPIEngine
     vector<CBullet*> mBullets;  //실제 주인공 기체가 사용할 탄환 객체들
 
     CEnemy* mpEnemy = nullptr;  //적 기체
+    vector<CBullet*> mBulletsEnemy;  //실제 적 기체가 사용할 탄환 객체들
 
 public:
     CRyuEngine() {};
@@ -68,6 +87,18 @@ public:
 private:
     CRyuEngine(const CRyuEngine& t) = delete;
     CRyuEngine& operator=(const CRyuEngine& t) = delete;
+
+public:
+    static VOID CALLBACK OnTimer_0(HWND thWnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+    {
+        OutputDebugString(L"=========OnTimer_0, Enemy Fire=======\n");
+
+        //정적staic함수에서 비정적 멤버변수에 접근이 불가능하다.
+        //mpEnemy->DoFire(mBulletsEnemy);
+
+        //이런 것은 가능
+        //CInputMgr::GetInstance();
+    }
 
 public:
     virtual void OnCreate() override
@@ -128,7 +159,7 @@ public:
         mpActor->AddRef();
 
         CBullet* tpBullet = nullptr;
-        for (int ti = 0; ti < 10; ++ti)
+        for (int ti = 0; ti < BULLET_COUNT_MAX; ++ti)
         {
             tpBullet = InstantObject<CBullet>(PFBullet);   //원본객체를 복제하여 객체를 생성
             tpBullet->AddRef();
@@ -145,21 +176,56 @@ public:
         mpEnemy = InstantObject<CEnemy>(PFEnemy);   //원본객체를 복제하여 객체를 생성
         mpEnemy->AddRef();
 
+        //적 기체의 일반탄환들
+        tpBullet = nullptr;
+        for (int ti = 0; ti < BULLET_COUNT_MAX; ++ti)
+        {
+            tpBullet = InstantObject<CBullet>(PFBullet);   //원본객체를 복제하여 객체를 생성
+            tpBullet->AddRef();
+
+            tpBullet->SetIsActive(false);   //탄환 객체들은 비활성으로 생성
+
+            mBulletsEnemy.push_back(tpBullet);
+            tpBullet->AddRef();
+
+            tpBullet->Release();
+            tpBullet = nullptr;
+        }
+
         //입력 매핑 등록
         CInputMgr::GetInstance()->AddKey("OnMoveLt", 'A');
         CInputMgr::GetInstance()->AddKey("OnMoveRt", 'D');
         CInputMgr::GetInstance()->AddKey("OnFire", VK_SPACE);
 
         CInputMgr::GetInstance()->AddKey("OnTest", VK_LCONTROL, 'H');
+
+        //test
+        //테스트로 한발만 발사해본다.
+        //mpEnemy->DoFire(mBulletsEnemy);
+
+        //3초 간격으로 작동하는 윈도우 타이머를 하나 만들고 설정했다.
+        //3초를 가정한다
+        // 마지막 인자를 널로 하면, 윈도우 메시지를 이용하여 처리하겠다의 의미
+        //SetTimer(this->mhWnd, 0, 3000, nullptr);
+        
+        SetTimer(this->mhWnd, 0, 3000, OnTimer_0);
     }
 
     virtual void OnDestroy() override
     {
+        //0번 타이머 해제
+        KillTimer(this->mhWnd, 0);
+
+        //적기체의 일반탄환 객체들 해제
+        for (vector<CBullet*>::iterator tItor = mBulletsEnemy.begin(); tItor != mBulletsEnemy.end(); ++tItor)
+        {
+            SAFE_RELEASE((*tItor)); //(*tItor)-> 이런 형태로 치환하기 위해 괄호를 서줬다.
+        }
+
         DestroyObject<CEnemy>(mpEnemy);
 
         //실제 객체 소멸
-        vector<CBullet*>::iterator tItor;
-        for (tItor = mBullets.begin(); tItor != mBullets.end(); ++tItor)
+        for (vector<CBullet*>::iterator tItor = mBullets.begin(); tItor != mBullets.end(); ++tItor)
         {
             SAFE_RELEASE((*tItor)); //(*tItor)-> 이런 형태로 치환하기 위해 괄호를 서줬다.
         }
@@ -199,39 +265,6 @@ public:
 
             비트연산으로 계산하므로 밑에 두가지경우가 참이된다.
         */
-
-        //A키가 눌리고 있다면
-        //SVector2D tVelocity;
-        //mpUnit->SetVelocity(tVelocity);
-        //if (GetAsyncKeyState('A') & 0x8000)
-        //{
-        //    //'오일러 축차적 적분법' 에 의한 위치 이동 코드
-        //    //mpUnit->mPosition.mX = mpUnit->mPosition.mX - 0.1f;
-        //    //순수한 방향의 속도 설정 (-1,0)
-        //    tVelocity.mX = -1.0f;
-        //    tVelocity.mY = 0.0f;
-
-        //    mpUnit->SetVelocity(tVelocity * 0.1f);
-        //    
-        //    OutputDebugString(L"key input A\n");
-        //}        
-        //if (GetAsyncKeyState('D') & 0x8000)
-        //{
-        //    //mpUnit->mPosition.mX = mpUnit->mPosition.mX + 0.1f;
-        //    //순수한 방향의 속도 설정 (+1,0)
-        //    tVelocity.mX = +1.0f;
-        //    tVelocity.mY = 0.0f;
-        //    
-        //    mpUnit->SetVelocity(tVelocity * 0.1f);
-
-        //    OutputDebugString(L"key input D\n");
-        //}        
-        //if (GetAsyncKeyState(VK_SPACE) & 0x8000) 
-        //{
-        //    OutputDebugString(L"Fire Bullet............VK_SPACE\n");
-        //}
-
-        //mpUnit->Update();
 
         SVector2D tVelocity;
         mpActor->SetVelocity(tVelocity);
@@ -276,13 +309,33 @@ public:
         
         //시간기반진행
         mpActor->Update(tDeltaTime);
-
         for (vector<CBullet*>::iterator tItor = mBullets.begin(); tItor != mBullets.end(); ++tItor)
         {
             (*tItor)->Update(tDeltaTime);
         }
 
         mpEnemy->Update(tDeltaTime);
+
+        //적 기체가 일반탄환을 일정 시간 간격으로 발사
+
+        if (mpEnemy->mTimeTick >= 2.0f)
+        {
+            //todo 일정시간 간격으로 실행할 코드
+            mpEnemy->DoFire(mBulletsEnemy);
+
+            //time tick을 초기 상태로 되돌려줌
+            mpEnemy->mTimeTick = 0.0f;
+        }
+        else
+        {
+            //delta time을 누적
+            mpEnemy->mTimeTick = mpEnemy->mTimeTick + tDeltaTime;
+        }
+
+        for (vector<CBullet*>::iterator tItor = mBulletsEnemy.begin(); tItor != mBulletsEnemy.end(); ++tItor)
+        {
+            (*tItor)->Update(tDeltaTime);
+        }
 
         //render
         this->Clear(0.1f, 0.1f, 0.3f);        
@@ -294,6 +347,10 @@ public:
             (*tItor)->Render();
         }
         mpEnemy->Render();
+        for (vector<CBullet*>::iterator tItor = mBulletsEnemy.begin(); tItor != mBulletsEnemy.end(); ++tItor)
+        {
+            (*tItor)->Render();
+        }
                 
         this->Present();
     }

@@ -316,6 +316,13 @@ LRESULT CALLBACK CAPIEngine::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPA
 {
     switch (message)
     {
+    case WM_TIMER:
+    {
+        //윈도우 타이머가 작동하는지만 테스트하자
+        OutputDebugString(L"----------------WM_TIMER Enemy DoFire----\n");
+    }
+    break;
+
     case WM_COMMAND:
     {
         int wmId = LOWORD(wParam);

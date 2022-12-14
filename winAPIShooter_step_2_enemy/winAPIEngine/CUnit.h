@@ -22,6 +22,8 @@ public:
 	virtual void Update(float tDeltaTime);
 	virtual void Render();
 
+	virtual void OnTimer() {};
+
 	inline void SetPosition(SVector2D tPosition)
 	{
 		mPosition = tPosition;
