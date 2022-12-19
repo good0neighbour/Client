@@ -29,8 +29,9 @@ public:
 
 
 	//주인공 기체는 일반탄환을 발사하는 기능을 가진다
-	void DoFire(vector<CBullet*>& tBullets);
-	void DoFireAimed(vector<CBullet*>& tBullets, CUnit* tpUnit);
+	void DoFire(vector<CBullet*>& tBullets);	//일반탄환을 발사하는 기능
+	void DoFireAimed(vector<CBullet*>& tBullets, CUnit* tpUnit);	//조준탄환을 발사하는 기능
+	void DoFireCircled(vector<CBullet*>& tBullets);	//원형탄환을 발사하는 기능
 
 private:
 	//임의의 탄환 이란 개념

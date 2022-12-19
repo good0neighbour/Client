@@ -1,23 +1,5 @@
 ﻿// winAPIEngine.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
-/*
-* 벡터: 크기와 방향을 아우르는 개념
-* vs 스칼라: 크기
-* 
-* 벡터의 연산
-* 
-* 벡터끼리의 덧셈(뺄셈)
-* 
-* 벡터의 스칼라 곱
-* 
-* 벡터끼리의 곱셈
-*   내적 dot production   A.B = ||A|| ||B|| cosT      = A.x * B.x + A.y * B.y
-*   외적 cross product    AxB = ||A|| ||B|| sinT U
-*                           ( U는 A와 B에 모두 수직인 단위벡터(크기가 1인 벡터) )
-* 
-* 벡터의 크기: 해당 벡터 자신을 내적하고 제곱근을 구한다
-* 벡터의 정규화: 벡터의 크기를 1로 만드는 연산( 크기분의 1을 스칼라곱한다 )
-*/
 
 #include "framework.h"
 #include "winAPIEngine.h"
@@ -53,78 +35,40 @@ using namespace std;
 /*
     이번 예시에서는 다음의 사항들을 만들어보자.
 
-     i) 적 기체 조준탄 발사
+     i) 적 기체 조준탄 '원형탄' 발사
 
-        벡터vector: '크기'와 '방향'을 아우르는 개념
+     <-- 극죄표계 polar coordinate system의 개념을 알아보자.
 
-        벡터의 연산 
+     좌표계는 물체의 위치를 지정하는 시스템이다.
+     좌표계에는 데카르트 좌표계만 있는 것은 아니다.
+     좌표계에는 종류가 많은데
+     그 중에서
+     '각도'와 '거리'를 구성성분으로 위치를 지정하는 시스템을
+     '극좌표계'라고 부른다
 
-            i)벡터끼리의 덧셈(뺄셈)
+     '데카르트 좌표계'의 구성성분과 '극좌표계'의 구성성분 사이의 관계식
 
-                각각의 구성성분끼리 더한다.
+     x = r * cosT
+     y = r * sinT
 
-                A = (1,0)
-                B = (0,1) 
+     ii)각도의 개념
 
-                A + B = (1,0) + (0,1) = (1+0, 0+1) = (1,1)
+     degree 도
 
-            ii)벡터의 스칼라곱
+     한바퀴(원)을 360등분한 것중에 하나가 1도
+     <-- 수학적인 개념이 아니다. 그냥 측정치다.
 
-                스칼라를 벡터의 각각의 구성성분에 곱한다. 
+     radian 호도
 
-                A = (1,0)
-                S = 2
+     반지름이 r인 원에서 원주에 r만큼을 1이라고 보는 각도 단위
+     <-- 원의 정의에서 부터 끌어낸 각도의 개념이다.
+     ---> 그래서 radian은 실수의 연산 체계에 통합한다.
 
-                A*S = (1,0)*2 = (1*2, 0*2) = (2, 0)
+     그래서,
+     수학 라이브러리나
+     게임엔진 등에 실제 동작은 radian을 기반으로 한다.
 
-            iii)벡터끼리의 곱셈
-                내적 dot product, inner product 
-
-                        A.B = ||A|| ||B|| cosT
-
-                        A = (1,0)
-                        B = (0,1)
-
-                        A.B = 1*1*0 = 0
-
-                        또 다른 수식 풀이법
-                        A.B = A.x*B.x + A.y*B.y = 1*0 + 0*1 = 0
-
-                        두 벡터의 내적의 결과값은 스칼라다
-
-                외적 cross product, outer product
-
-                        AxB = ||A|| ||B|| sinT U
-                        ( U는 A와 B에 모두 수직인 단위벡터) 
-
-                        A = (1,0)
-                        B = (0,1)
-
-                        AxB = 1*1*1*(0,0,1) = (0,0,1)
-
-                        3차원의 기저벡터들
-                        i = (1,0,0)         //x축 기저벡터
-                        j = (0,1,0)         //y축 기저벡터
-                        k = (0,0,1)         //z축 기저벡터
-
-                        AxB = (A.y*B.z - A.z*B.y)*i + (A.z*B.x - A.x*B.z)*j + (A.x*B.y - A.y*B.x)*k 
-                               = (0*0 - 0*1)*i + 
-                                  (0*0 - 1*0)*j +
-                                  (1*1 - 0*0)*k
-
-                                = 0*i + 0*j + 1*k  
-                                = 1*(0, 0, 1) = (0,0,1)
-
-                        두 벡터의 외적의 결과값은 벡터이다.
-
-            iv) 벡터의 크기: 자기자신을 내적한 것이 노름의 제곱인 것과 같다는 식을 이용한다
-            v) 벡터의 정규화: 벡터의 크기를 1로 만드는 것
-                        <--벡터에 크기분의 1을 스칼라곱 해주어 만든다
-
-            단위벡터: 크기가 1인 벡터
-            법선벡터: 평면에 수직인 단위벡터
-
-     ii) i)사항을 구현하며 SVector2D 의 연산자들을 만들어본다.
+     radian = PI / 180
 */
 
 class CRyuEngine : public CAPIEngine
@@ -158,6 +102,9 @@ class CRyuEngine : public CAPIEngine
 
     CEnemy* mpEnemyAimed = nullptr;      //조준 탄환객체을 발사할 적 객체
     vector<CBullet*> mBulletsEnemyAimed;      //조준 탄환객체들
+
+    CEnemy* mpEnemyCircled = nullptr;      //원형객체을 발사할 적 객체
+    vector<CBullet*> mBulletsEnemyCircled;      //원형 탄환객체들
 
 public:
     CRyuEngine() {};
@@ -210,16 +157,13 @@ public:
         //자원 로드 부분
         //todo
         mpTexture = new CTexture();
-        mpTexture->LoadTexture(hInst, mhDC, L"resources/bongbong_0.bmp");
+        mpTexture->LoadTexture(hInst, mhDC, L"resources/googleimage.bmp");
 
         mpTexBullet = new CTexture();
         mpTexBullet->LoadTexture(hInst, mhDC, L"resources/bongbullet.bmp");
 
         mpTexEnemy = new CTexture();
-        mpTexEnemy->LoadTexture(hInst, mhDC, L"resources/bongenemy.bmp");
-
-
-
+        mpTexEnemy->LoadTexture(hInst, mhDC, L"resources/googleEnemy.bmp");
 
         //원본객체(주인공 기체에 대한 원본 객체 ) 생성
         //PFActor = new CActor();        
@@ -292,6 +236,24 @@ public:
             tpBullet = nullptr;
         }
 
+        mpEnemyCircled = InstantObject<CEnemy>(PFEnemy);               //원본객체를 복제하여 객체를 생성
+        mpEnemyCircled->AddRef();
+
+        //8발씩 BULLET_COUNT_MAX벌 준비
+        for (int ti = 0; ti < 8 * BULLET_COUNT_MAX; ++ti)
+        {
+            tpBullet = InstantObject<CBullet>(PFBullet);               //원본객체를 복제하여 객체를 생성
+            tpBullet->AddRef();
+
+            tpBullet->SetIsActive(false);           //탄환객체들은 비활성으로 생성
+
+            mBulletsEnemyCircled.push_back(tpBullet);
+            tpBullet->AddRef();
+
+            tpBullet->Release();
+            tpBullet = nullptr;
+        }
+
         //입력 매핑 등록
         CInputMgr::GetInstance()->AddKey("OnMoveLt", 'A');
         CInputMgr::GetInstance()->AddKey("OnMoveRt", 'D');
@@ -314,6 +276,8 @@ public:
 
         //게임 프로그램 시작시, 오른쪽 방향으로 이동 시작
         mpEnemy->SetVelocity(SVector2D(+1.0f, 0.0f) * 100.0f);
+
+        mpEnemyCircled->SetVelocity(SVector2D(-1.0f, 0.0f) * 50.0f);
     }
 
     virtual void OnDestroy() override
@@ -326,6 +290,13 @@ public:
             delete mpTexture;
             mpTexture = nullptr;
         }*/
+        //적기체의 조준탄환 객체들 해제
+        for (vector<CBullet*>::iterator tItor = mBulletsEnemyCircled.begin(); tItor != mBulletsEnemyCircled.end(); ++tItor)
+        {
+            SAFE_RELEASE((*tItor));       //(*tItor)-> 이런 형태로 치환하기 위해 괄호를 써줬다.            
+        }
+
+        DestroyObject<CEnemy>(mpEnemyCircled);
 
         //적기체의 조준탄환 객체들 해제
         for (vector<CBullet*>::iterator tItor = mBulletsEnemyAimed.begin(); tItor != mBulletsEnemyAimed.end(); ++tItor)
@@ -503,6 +474,27 @@ public:
             (*tItor)->Update(tDeltaTime);
         }
 
+        mpEnemyCircled->Update(tDeltaTime);
+        //적 기체가 일반탄환을 일정시간 간격으로 발사
+        if (mpEnemyCircled->mTimeTick >= 3.0f)
+        {
+            //todo 일정시간 간격으로 실행할 코드
+            mpEnemyCircled->DoFireCircled(mBulletsEnemyCircled);
+
+            //time tick을 초기 상태로 되돌려줌
+            mpEnemyCircled->mTimeTick = 0.0f;
+        }
+        else
+        {
+            //delta time 을 누적
+            mpEnemyCircled->mTimeTick = mpEnemyCircled->mTimeTick + tDeltaTime;
+        }
+
+        for (vector<CBullet*>::iterator tItor = mBulletsEnemyCircled.begin(); tItor != mBulletsEnemyCircled.end(); ++tItor)
+        {
+            (*tItor)->Update(tDeltaTime);
+        }
+
         //render
         this->Clear(0.1f, 0.1f, 0.3f);        
         
@@ -519,6 +511,12 @@ public:
 
         mpEnemyAimed->Render();
         for (vector<CBullet*>::iterator tItor = mBulletsEnemyAimed.begin(); tItor != mBulletsEnemyAimed.end(); ++tItor)
+        {
+            (*tItor)->Render();
+        }
+
+        mpEnemyCircled->Render();
+        for (vector<CBullet*>::iterator tItor = mBulletsEnemyCircled.begin(); tItor != mBulletsEnemyCircled.end(); ++tItor)
         {
             (*tItor)->Render();
         }

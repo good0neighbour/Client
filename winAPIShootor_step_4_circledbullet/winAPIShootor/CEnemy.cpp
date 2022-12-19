@@ -97,6 +97,40 @@ void CEnemy::DoFireAimed(vector<CBullet*>& tBullets, CUnit* tpUnit)
     }
 }
 
+void CEnemy::DoFireCircled(vector<CBullet*>& tBullets)
+{
+    //발사 루틴
+        //		탄환 발사
+        //  i) 탄환의 '발사시작지점'을 설정한다
+        //  ii) 탄환의 '속도'를 설정한다
+        //  iii) 탄환을 '활성화'시킨다
+
+    //8발 동시 발사
+    for (int ti = 0; ti < 8; ++ti)
+    {
+        tBullets[ti]->SetPosition(this->GetPosition());  //발사시작지점은 주인공기체의 위치
+
+        //속도 벡터 각각의 구성성분
+        float tAngleDegree = 45.0f * ti;    //45도 간격
+        float tDirX = 1.0f * cosf(tAngleDegree * (3.14159f / 180.0f));  //degree --> radian
+        float tDirY = 1.0f * sinf(tAngleDegree * (3.14159f / 180.0f));  //degree --> radian
+
+        tBullets[ti]->SetVelocity(SVector2D(tDirX, tDirY) * 200.0f);      //벡터의 스칼라곱
+
+        tBullets[ti]->SetIsActive(true);
+    }
+
+    //if (mCurIndexBullet < tBullets.size() - 1)
+    //{
+    //    //탄환 순번 증가
+    //    ++mCurIndexBullet;
+    //}
+    //else
+    //{
+    //    mCurIndexBullet = 0;
+    //}
+}
+
 void CEnemy::OnTimer()
 {
     OutputDebugString(L"OnTimer Enemy Fire\n");
