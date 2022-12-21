@@ -24,6 +24,8 @@
 
 #include "CRyuTimer.h"
 
+#include "CCollider.h"
+
 //test
 #include <list>
 using namespace std;
@@ -35,20 +37,11 @@ using namespace std;
 /*
     이번 예시에서는 다음의 사항들을 만들어보자.
 
-    충돌collision
+    충돌 관리자
 
-    물리학에서 두 물체가 서로의 운동에 간섭하는 현상
-    --> 게임세계에서 두 게임오브젝트가 서로 간섭하는 현상
-    <-- 게임세계는 끊임없이 갱신된다. 또한 게임오브젝트들은 서로 상호작용한다
-    --> 그 상호작용의 기반이 되는 것이 '충돌'이다.
+    i)클래스를 추가하고 싱글톤 패턴을 적용하자.
 
-     i) 원 대 원 충돌 알고리즘
-
-        원을 이용한 충돌검사
-
-     ii) AABB 충돌 알고리즘
-
-        Axis Aligned Bounding Box( 축 정렬 경계상자 ) 를 이용한 충돌검사
+    ii) 충돌의 상태(충돌시작, 충돌 중, 충돌 종료) 를 구분해내기 위한 프로그램 구종를 작성하자.
 */
 
 class CRyuEngine : public CAPIEngine
@@ -351,22 +344,44 @@ public:
         //}
 
         //AABB
+        //for (vector<CBullet*>::iterator tItor = mBullets.begin(); tItor != mBullets.end(); ++tItor)
+        //{
+        //    if ((*tItor)->GetIsActive())
+        //    {
+        //        if (mpEnemy->GetIsActive())
+        //        {
+        //            bool tIsCollision = (*tItor)->Intersects((*mpEnemy));
+        //            if (tIsCollision)
+        //            {
+        //                //충돌 처리
+
+        //                //탄환 제거
+        //                (*tItor)->SetIsActive(false);
+
+        //                //적 제거
+        //                mpEnemy->SetIsActive(false);
+        //                break;
+        //            }
+        //        }
+        //    }
+        //}
+
         for (vector<CBullet*>::iterator tItor = mBullets.begin(); tItor != mBullets.end(); ++tItor)
         {
             if ((*tItor)->GetIsActive())
             {
                 if (mpEnemy->GetIsActive())
                 {
-                    bool tIsCollision = (*tItor)->Intersects((*mpEnemy));
+                    bool tIsCollision = (*tItor)->mpCollider->DoCollision(mpEnemy->mpCollider);
                     if (tIsCollision)
                     {
                         //충돌 처리
 
                         //탄환 제거
                         (*tItor)->SetIsActive(false);
-
                         //적 제거
                         mpEnemy->SetIsActive(false);
+
                         break;
                     }
                 }

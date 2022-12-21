@@ -24,6 +24,8 @@
 
 #include "CRyuTimer.h"
 
+#include "CCollider.h"
+
 //test
 #include <list>
 using namespace std;
@@ -35,20 +37,14 @@ using namespace std;
 /*
     이번 예시에서는 다음의 사항들을 만들어보자.
 
-    충돌collision
+    '충돌에 관한 여러 사항들'을 관리하는
+    충돌 관리자 collision manager 를 만들어봅시다.
 
-    물리학에서 두 물체가 서로의 운동에 간섭하는 현상
-    --> 게임세계에서 두 게임오브젝트가 서로 간섭하는 현상
-    <-- 게임세계는 끊임없이 갱신된다. 또한 게임오브젝트들은 서로 상호작용한다
-    --> 그 상호작용의 기반이 되는 것이 '충돌'이다.
+        '충돌에 관련한 여러 사항들'
+        i) 충돌에 상태를 부여. 충돌시작, 충돌중, 충돌끝
+        ii) 충돌에 관한 처리 구조를 만들자.
 
-     i) 원 대 원 충돌 알고리즘
-
-        원을 이용한 충돌검사
-
-     ii) AABB 충돌 알고리즘
-
-        Axis Aligned Bounding Box( 축 정렬 경계상자 ) 를 이용한 충돌검사
+    이번 예시에서는 '충돌체'collider 를 만들자.
 */
 
 class CRyuEngine : public CAPIEngine
@@ -351,22 +347,44 @@ public:
         //}
 
         //AABB
+        //for (vector<CBullet*>::iterator tItor = mBullets.begin(); tItor != mBullets.end(); ++tItor)
+        //{
+        //    if ((*tItor)->GetIsActive())
+        //    {
+        //        if (mpEnemy->GetIsActive())
+        //        {
+        //            bool tIsCollision = (*tItor)->Intersects((*mpEnemy));
+        //            if (tIsCollision)
+        //            {
+        //                //충돌 처리
+
+        //                //탄환 제거
+        //                (*tItor)->SetIsActive(false);
+
+        //                //적 제거
+        //                mpEnemy->SetIsActive(false);
+        //                break;
+        //            }
+        //        }
+        //    }
+        //}
+
         for (vector<CBullet*>::iterator tItor = mBullets.begin(); tItor != mBullets.end(); ++tItor)
         {
             if ((*tItor)->GetIsActive())
             {
                 if (mpEnemy->GetIsActive())
                 {
-                    bool tIsCollision = (*tItor)->Intersects((*mpEnemy));
+                    bool tIsCollision = (*tItor)->mpCollider->DoCollision(mpEnemy->mpCollider);
                     if (tIsCollision)
                     {
                         //충돌 처리
 
                         //탄환 제거
                         (*tItor)->SetIsActive(false);
-
                         //적 제거
                         mpEnemy->SetIsActive(false);
+
                         break;
                     }
                 }
