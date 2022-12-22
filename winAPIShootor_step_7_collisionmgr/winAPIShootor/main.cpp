@@ -25,6 +25,7 @@
 #include "CRyuTimer.h"
 
 #include "CCollider.h"
+#include "CCollisionMgr.h"
 
 //test
 #include <list>
@@ -164,6 +165,9 @@ public:
             tpBullet = InstantObject<CBullet>(PFBullet);               //원본객체를 복제하여 객체를 생성
                 tpBullet->AddRef();
 
+                //
+                CCollisionMgr::GetInstance()->AddUnit(tpBullet);
+
             tpBullet->SetIsActive(false);           //탄환객체들은 비활성으로 생성
 
             mBullets.push_back(tpBullet);
@@ -175,6 +179,9 @@ public:
 
         mpEnemy = InstantObject<CEnemy>(PFEnemy);               //원본객체를 복제하여 객체를 생성
         mpEnemy->AddRef();
+
+        //
+        CCollisionMgr::GetInstance()->AddUnit(mpEnemy);
 
         //적 기체의 일반탄환들
         tpBullet = nullptr;
@@ -366,27 +373,27 @@ public:
         //    }
         //}
 
-        for (vector<CBullet*>::iterator tItor = mBullets.begin(); tItor != mBullets.end(); ++tItor)
-        {
-            if ((*tItor)->GetIsActive())
-            {
-                if (mpEnemy->GetIsActive())
-                {
-                    bool tIsCollision = (*tItor)->mpCollider->DoCollision(mpEnemy->mpCollider);
-                    if (tIsCollision)
-                    {
-                        //충돌 처리
+        //for (vector<CBullet*>::iterator tItor = mBullets.begin(); tItor != mBullets.end(); ++tItor)
+        //{
+        //    if ((*tItor)->GetIsActive())
+        //    {
+        //        if (mpEnemy->GetIsActive())
+        //        {
+        //            bool tIsCollision = (*tItor)->mpCollider->DoCollision(mpEnemy->mpCollider);
+        //            if (tIsCollision)
+        //            {
+        //                //충돌 처리
 
-                        //탄환 제거
-                        (*tItor)->SetIsActive(false);
-                        //적 제거
-                        mpEnemy->SetIsActive(false);
+        //                //탄환 제거
+        //                (*tItor)->SetIsActive(false);
+        //                //적 제거
+        //                mpEnemy->SetIsActive(false);
 
-                        break;
-                    }
-                }
-            }
-        }
+        //                break;
+        //            }
+        //        }
+        //    }
+        //}
 
         //mTimerForEnemy.Update(tDeltaTime);
 

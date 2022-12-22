@@ -146,6 +146,9 @@ void CAPIEngine::OnDestroy()
 }
 void CAPIEngine::OnUpdate(float tDeltaTime)
 {
+    //충돌 관리자 갱신
+    CCollisionMgr::GetInstance()->Update(tDeltaTime);
+
     //입력처리 상태 갱신
     CInputMgr::GetInstance()->Update();
 
