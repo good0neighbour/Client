@@ -19,7 +19,8 @@ public:
     //애니메이션 시퀀스 진행
     void Update(float tDeltaTime);
 
-private:
+public:
+//private:
     //애니메이션 시퀀스를 구별할 식별자
     string mId = "";
 

@@ -11,6 +11,8 @@ class CTexture;
 
 class CCollider;
 
+class CAnimator;
+
 class CUnit: public CObjectRyu
 {
 public:
@@ -198,11 +200,16 @@ public: //일단 쉬운 작성을 위해 은닉화 생략
 	CCollider* mpCollider = nullptr;
 
 	//물체를 구분할 수 있게 태그 개념을 만들겠다
-	string mTag;
+	string mTag = "";
+
+	CAnimator* mpAnimator = nullptr;
 
 public:
 	//순수 가상 함수
 	//clone이라는 형태로 형태를 강제하여 구현하는 것이다
 	virtual CObjectRyu* clone() = 0;
+
+	CAnimator* CreateAnimator(const string& tId, CAPIEngine* tpEngine);
+	void DestroyAnimator();
 };
 

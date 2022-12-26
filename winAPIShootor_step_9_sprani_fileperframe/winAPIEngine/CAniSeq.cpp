@@ -2,6 +2,8 @@
 
 #include "ryumacro.h"
 
+#include "CTexture.h"
+
 CAniSeq::CAniSeq()
 {
     mId = "";

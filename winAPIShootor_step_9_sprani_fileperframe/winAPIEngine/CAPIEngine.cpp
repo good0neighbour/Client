@@ -5,8 +5,6 @@
 
 #include "CInputMgr.h"
 
-HINSTANCE CAPIEngine::hInst = nullptr;
-
 CAPIEngine::CAPIEngine()
 {
     //멤버변수 초기화
@@ -397,7 +395,7 @@ LRESULT CALLBACK CAPIEngine::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPA
         switch (wmId)
         {
         case IDM_ABOUT:
-            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            //DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
             break;
         case IDM_EXIT:
             DestroyWindow(hWnd);

@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CAnimator.h" />
     <ClInclude Include="CAniSeq.h" />
     <ClInclude Include="CAPIEngine.h" />
     <ClInclude Include="CCollider.h" />
@@ -160,6 +161,7 @@
     <ClInclude Include="winAPIEngine.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CAnimator.cpp" />
     <ClCompile Include="CAniSeq.cpp" />
     <ClCompile Include="CAPIEngine.cpp" />
     <ClCompile Include="CCollider.cpp" />
