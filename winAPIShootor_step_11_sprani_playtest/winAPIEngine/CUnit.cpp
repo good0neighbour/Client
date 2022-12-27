@@ -74,10 +74,16 @@ CUnit::CUnit(const CUnit& t)
 
 	mTag = t.mTag;
 
-	mpAnimator = t.mpAnimator;
-	//mpAnimator = new CAnimator();
-	//(*mpAnimator) = (*t.mpAnimator);
-	////??
+	//shallow copy
+	//mpAnimator = t.mpAnimator;
+	//deep copy
+	//원본객체가 mpAnimator객체를 유효하게 가진 경우만 deep copy
+	if (t.mpAnimator)
+	{
+		mpAnimator = new CAnimator();
+		(*mpAnimator) = (*t.mpAnimator);
+		mpAnimator->SetOwnerObject(this);
+	}
 }
 
 void CUnit::operator=(const CUnit& t)
@@ -116,10 +122,16 @@ void CUnit::operator=(const CUnit& t)
 
 	mTag = t.mTag;
 
-	mpAnimator = t.mpAnimator;
-	//mpAnimator = new CAnimator();
-	//(*mpAnimator) = (*t.mpAnimator);
-	////??
+	//shallow copy
+	//mpAnimator = t.mpAnimator;
+	//deep copy
+	//원본객체가 mpAnimator객체를 유효하게 가진 경우만 deep copy
+	if (t.mpAnimator)
+	{
+		mpAnimator = new CAnimator();
+		(*mpAnimator) = (*t.mpAnimator);
+		mpAnimator->SetOwnerObject(this);
+	}
 }
 
 void CUnit::Create(CAPIEngine* tpEngine)
