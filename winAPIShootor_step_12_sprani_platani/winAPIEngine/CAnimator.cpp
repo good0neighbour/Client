@@ -43,7 +43,7 @@ CAnimator::CAnimator(const CAnimator& t)
 	//애니메이터는 각 유닛 객체마다 따로 가져야 하므로 깊은 복사를 수행하였다.
 	mAniSeq.clear();
 	unordered_map<string, CAniSeq*>::const_iterator tItor;
-	for (tItor = t.mAniSeq.begin(); tItor != t.mAniSeq.end(); ++tItor)
+	for (tItor = mAniSeq.begin(); tItor != mAniSeq.end(); ++tItor)
 	{
 		//복사의 원본 객체만큼 애니메이션 시퀀스 갯수를 만든다
 		CAniSeq* tpAniSeq = new CAniSeq();
@@ -159,6 +159,43 @@ void CAnimator::Render(float tX, float tY)
 		mpEngine->DrawTexture(tX, tY, tpTex);
 	}
 
+	LateUpdate();
+}
+
+void CAnimator::SetDefaultAniSeq(const string& tStrDefaultAniSeq)
+{
+	//현재 플레이 중인 애니메이션 시퀀스를 기억시켜 둔다
+	mStrKeyPrevAniSeq = tStrDefaultAniSeq;
+
+	//새로 플레이할 애니매이션 시퀀스를 설정한다
+	mStrKeyCurAniSeq = tStrDefaultAniSeq;
+
+	if (mpCurAniSeq)
+	{
+		//애니메이션 시퀀스 플레이 관련 변수 초기화
+		mpCurAniSeq->mCurFrameIndex = 0;
+		mpCurAniSeq->mAniTime = 0.0f;
+	}
+}
+
+void CAnimator::PlayAni(const string& tStrAniSeq)
+{
+	//현재 플레이 중인 애니메이션 시퀀스를 기억시켜 둔다
+	mStrKeyPrevAniSeq = mStrKeyCurAniSeq;
+
+	//새로 플레이할 애니매이션 시퀀스를 설정한다
+	mStrKeyCurAniSeq = tStrAniSeq;
+
+	if (mpCurAniSeq)
+	{
+		//애니메이션 시퀀스 플레이 관련 변수 초기화
+		mpCurAniSeq->mCurFrameIndex = 0;
+		mpCurAniSeq->mAniTime = 0.0f;
+	}
+}
+
+void CAnimator::LateUpdate()
+{
 	//애니메이션 시퀀스 플레이 옵션에 따라서 분기
 	switch (mpCurAniSeq->mPlayOption)
 	{
@@ -175,11 +212,17 @@ void CAnimator::Render(float tX, float tY)
 
 		if (mpCurAniSeq->mCurFrameIndex == mpCurAniSeq->mTotalFrameCount - 1)
 		{
-			mStrKeyCurAniSeq = mStrKeyPrevAniSeq;
+			//여기에 임의의 스프라이트 프레임 유지 시간을 넣어준 이유는,
+			//이렇게 하지 않으면 마지막 스프라이트 프레임 이 딱 한 게임 루프 프레임만 랜더되므로
+			//우리가 의도한 대로 제대로 랜더되지 않기 때문이다.
+			if (mpCurAniSeq->mAniTime >= mpCurAniSeq->mTimeInterval)
+			{
+				mStrKeyCurAniSeq = mStrKeyPrevAniSeq;
 
-			//애니메이션 시퀀스 플레이 관련 변수 초기화
-			mpCurAniSeq->mCurFrameIndex = 0;
-			mpCurAniSeq->mAniTime = 0.0f;
+				//애니메이션 시퀀스 플레이 관련 변수 초기화
+				mpCurAniSeq->mCurFrameIndex = 0;
+				mpCurAniSeq->mAniTime = 0.0f;
+			}
 		}
 	}
 	break;

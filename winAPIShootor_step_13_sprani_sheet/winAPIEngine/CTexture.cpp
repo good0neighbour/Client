@@ -20,11 +20,13 @@ bool CTexture::LoadTexture(HINSTANCE hInst, HDC hDC, LPCWSTR tFileName)
         0, 0,
         LR_LOADFROMFILE);       //<-- LR~ Load Resource
 
+
     mhOldBitmap = (HBITMAP)SelectObject(mhDCMem, mhBitmap);
 
     //비트맵 정보를 얻어오자
     mBitmapInfo;
     GetObject(mhBitmap, sizeof(mBitmapInfo), &mBitmapInfo);
+
 
 	return true;
 }
@@ -34,6 +36,7 @@ void CTexture::UnloadTexture()
     DeleteObject(mhBitmap);
 
     DeleteDC(mhDCMem);      //memory DC를 삭제한다
+
 }
 
 bool CTexture::CreateBackBuffer(HINSTANCE hInst, HDC hDC)
@@ -43,11 +46,13 @@ bool CTexture::CreateBackBuffer(HINSTANCE hInst, HDC hDC)
     mhBitmap = (HBITMAP)CreateCompatibleBitmap(hDC, 800, 600);  
     //현재화면DC와 크기가 같은 memoryDC에 설정된 비트맵을 하나 만든다
 
+
     mhOldBitmap = (HBITMAP)SelectObject(mhDCMem, mhBitmap);
 
     //비트맵 정보를 얻어오자
     mBitmapInfo;
     GetObject(mhBitmap, sizeof(mBitmapInfo), &mBitmapInfo);
+
 
     return true;
 }

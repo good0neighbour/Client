@@ -171,7 +171,7 @@ public:
         PFEnemy = CreatePrefab<CEnemy>(mpTexEnemy, 0.5f, 0.5f, SVector2D(800 * 0.5f, 100.0f));
         CAnimator* tpAnimEnemy = PFEnemy->CreateAnimator("AnimEnemy", this);
         tpAnimEnemy->AddAniSeq("ani_idle_enemy", 0.1f, 7, L"resources/paladin_idle");
-        tpAnimEnemy->AddAniSeq("ani_super_enemy", 0.1f, 11, L"resources/paladin_attack", ANI_PO::ONCE);
+        tpAnimEnemy->AddAniSeq("ani_attack_enemy", 0.1f, 11, L"resources/paladin_attack", ANI_PO::ONCE);
 
         //기본 애니메이션 시퀀스 지정
         tpAnimEnemy->mStrKeyCurAniSeq = "ani_idle_enemy";   //현재
@@ -530,7 +530,7 @@ public:
 
         //적 기체가 일반탄환을 일정시간 간격으로 발사
 
-        if ( mpEnemy->mTimeTick >= 5.0f )
+        if ( mpEnemy->mTimeTick >= 2.0f )
         {
             //todo 일정시간 간격으로 실행할 코드
             mpEnemy->DoFire(mBulletsEnemy);
@@ -539,6 +539,10 @@ public:
             //해당 식별자의 애니메이션 플레이 시작
             mpEnemy->mpAnimator->mStrKeyPrevAniSeq = mpEnemy->mpAnimator->mStrKeyCurAniSeq; //현재 것을 기억시켜 둔다
             mpEnemy->mpAnimator->mStrKeyCurAniSeq = "ani_attack_enemy";
+
+            //애니메이션 시퀀스 플레이 관련 변수 초기화
+            mpEnemy->mpAnimator->mpCurAniSeq->mCurFrameIndex = 0;
+            mpEnemy->mpAnimator->mpCurAniSeq->mAniTime = 0.0f;
 
             //time tick을 초기 상태로 되돌려줌
             mpEnemy->mTimeTick = 0.0f;

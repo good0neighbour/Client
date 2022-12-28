@@ -41,7 +41,7 @@ CAnimator::CAnimator(const CAnimator& t)
 	//애니메이터는 각 유닛 객체마다 따로 가져야 하므로 깊은 복사를 수행하였다.
 	mAniSeq.clear();
 	unordered_map<string, CAniSeq*>::const_iterator tItor;
-	for (tItor = mAniSeq.begin(); tItor != mAniSeq.end(); ++tItor)
+	for (tItor = t.mAniSeq.begin(); tItor != t.mAniSeq.end(); ++tItor)
 	{
 		//복사의 원본 객체만큼 애니메이션 시퀀스 갯수를 만든다
 		CAniSeq* tpAniSeq = new CAniSeq();
@@ -69,7 +69,7 @@ void CAnimator::operator =(const CAnimator& t)
 	//애니메이터는 각 유닛 객체마다 따로 가져야 하므로 깊은 복사를 수행하였다.
 	mAniSeq.clear();
 	unordered_map<string, CAniSeq*>::const_iterator tItor;
-	for (tItor = mAniSeq.begin(); tItor != mAniSeq.end(); ++tItor)
+	for (tItor = t.mAniSeq.begin(); tItor != t.mAniSeq.end(); ++tItor)
 	{
 		//복사의 원본 객체만큼 애니메이션 시퀀스 갯수를 만든다
 		CAniSeq* tpAniSeq = new CAniSeq();
@@ -114,7 +114,7 @@ bool CAnimator::AddAniSeq(const string& tId, float tTimeInterval, int tTotalFram
 
 	mAniSeq.insert(make_pair(tId, tpAniSeq));
 
-	return false;
+	return true;
 }
 
 void CAnimator::UpdateAnimation(float tDeltaTime)
