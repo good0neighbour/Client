@@ -150,6 +150,7 @@
     <ClInclude Include="CActor.h" />
     <ClInclude Include="CBullet.h" />
     <ClInclude Include="CEnemy.h" />
+    <ClInclude Include="CExplosion.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="CRyuTimer.h" />
   </ItemGroup>
@@ -157,6 +158,7 @@
     <ClCompile Include="CActor.cpp" />
     <ClCompile Include="CBullet.cpp" />
     <ClCompile Include="CEnemy.cpp" />
+    <ClCompile Include="CExplosion.cpp" />
     <ClCompile Include="CRyuTimer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

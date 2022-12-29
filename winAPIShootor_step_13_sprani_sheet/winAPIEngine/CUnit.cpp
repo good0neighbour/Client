@@ -163,20 +163,18 @@ void CUnit::Render()
 {	
 	if (mIsActive)
 	{
-		//피벗을 고려하여 출력하기
-		mWidth = mpTexture->mBitmapInfo.bmWidth;
-		mHeight = mpTexture->mBitmapInfo.bmHeight;
-
-		//mDisplayX, mDisplayY 결정식
-		/*mDisplayX = mX - mWidth * mAnchorX;
-		mDisplayY = mY - mHeight* mAnchorY;*/
-		mDisplayX = mPosition.mX - mWidth * mAnchorX;
-		mDisplayY = mPosition.mY - mHeight * mAnchorY;
-
 		//애니메이션 정보가 있으면 애니메이터로 랜더
 		//그렇지 않으면 대표이미지로 랜더
 		if (nullptr != mpAnimator)
 		{
+			//피벗을 고려하여 출력하기
+			mWidth = mpAnimator->mpCurAniSeq->mSpriteWidth;
+			mHeight = mpAnimator->mpCurAniSeq->mSpriteHeight;
+
+			//mDisplayX, mDisplayY 결정식
+			mDisplayX = mPosition.mX - mWidth * mAnchorX;
+			mDisplayY = mPosition.mY - mHeight * mAnchorY;
+
 			mpAnimator->UpdateAnimation(mpEngine->GetDeltaTime());
 			mpAnimator->Render(mDisplayX, mDisplayY);
 		}

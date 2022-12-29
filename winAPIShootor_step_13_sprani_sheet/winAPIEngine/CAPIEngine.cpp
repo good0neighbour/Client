@@ -215,14 +215,6 @@ void CAPIEngine::DrawRect(float tX, float tY, float tWidth, float tHeight, float
 
 void CAPIEngine::DrawTexture(float tX, float tY, CTexture* tpTexture, COLORREF tColorKey)
 {
-    //이제 후면버퍼에 그린다
-    /*BitBlt(this->mpBackBuffer->mhDCMem,
-        tX, tY,
-        tpTexture->mBitmapInfo.bmWidth, tpTexture->mBitmapInfo.bmHeight,
-        tpTexture->mhDCMem,
-        0, 0,
-        SRCCOPY);*/
-
     TransparentBlt(this->mpBackBuffer->mhDCMem,
         tX, tY,
         tpTexture->mBitmapInfo.bmWidth, tpTexture->mBitmapInfo.bmHeight,
@@ -233,6 +225,33 @@ void CAPIEngine::DrawTexture(float tX, float tY, CTexture* tpTexture, COLORREF t
 
         tColorKey
         );
+}
+
+void CAPIEngine::DrawTexturePartial(float tX, float tY, CTexture* tpTexture, int tRow, int tCol, int tIndex, COLORREF tColorKey)
+{
+    //스프라이트 시트 안에서 임의의 프레임의 너비, 높이
+    int tSrcWidth = tpTexture->mBitmapInfo.bmWidth / tCol;
+    int tSrcHeight = tpTexture->mBitmapInfo.bmHeight / tRow;
+
+    //행, 열 단위의 좌표
+    int tCurCol = tIndex % tCol;
+    int tCurRow = tIndex / tCol;
+
+    //스프라이트 시트  안에서 임의의 프레임의 왼쪽 상단 위치
+    //픽셀 단위의 좌표
+    int tSrcX = tCurCol * tSrcWidth;
+    int tSrcY = tCurRow * tSrcHeight;
+
+    TransparentBlt(this->mpBackBuffer->mhDCMem,
+        tX, tY,
+        tSrcWidth, tSrcHeight,
+
+        tpTexture->mhDCMem,
+        tSrcX, tSrcY,
+        tSrcWidth, tSrcHeight,
+
+        tColorKey
+    );
 }
 
 /*

@@ -30,6 +30,9 @@
     <ClInclude Include="CRyuTimer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="CExplosion.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CActor.cpp">
@@ -45,6 +48,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="CRyuTimer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CExplosion.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

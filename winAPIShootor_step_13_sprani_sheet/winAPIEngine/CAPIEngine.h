@@ -40,6 +40,8 @@ public:
 	//투명 컬러키로 하얀색을 지정, 매개변수 기본값 문법을 이용
 	void DrawTexture(float tX, float tY, CTexture* tpTexture, COLORREF tColorKey = RGB(255, 255, 255));
 
+	void DrawTexturePartial(float tX, float tY, CTexture* tpTexture, int tRow, int tCol, int tIndex, COLORREF tColorKey = RGB(255, 255, 255));
+
 	//정규화: 크기를 1로 만들어 다루는 개념
 	// [0,1] <--폐구간 0에서 1사이의 수치(0과 1 포함)
 

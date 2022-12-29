@@ -26,7 +26,7 @@ public:
 
 public:
 	//애니메이션 시퀀스를 추가하는 함수
-	bool AddAniSeq(const string& tId, float tTimeInterval, int tTotalFrameCount, LPCWSTR tpFileName, ANI_PO tPlayOption = ANI_PO::LOOP);
+	bool AddAniSeq(const string& tId, float tTimeInterval, int tTotalFrameCount, LPCWSTR tpFileName, ANI_PO tPlayOption = ANI_PO::LOOP, ANI_SO tSpriteOption = ANI_SO::FRAME_FILE, int tRow = 1, int tCol = 1);
 	//현재 애니메이션 시퀀스를 위해 데이터 갱신
 	void UpdateAnimation(float tDeltaTime);
 	//현재 애니메이션 시퀀스의 결과 포즈를 랜더링

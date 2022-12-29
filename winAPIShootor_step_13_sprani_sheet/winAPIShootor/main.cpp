@@ -29,6 +29,8 @@
 #include "CAniSeq.h"
 #include "CAnimator.h"
 
+#include "CExplosion.h"
+
 //test
 #include <list>
 using namespace std;
@@ -63,7 +65,7 @@ using namespace std;
     explosionFull.bmp 리소스를 가정한다.
     2048 * 1024의 크기를 가진다.
     4행 8열의 스프라이트 프레임들
-    이 하나의 임지 파일로 구성되어 있다.( 4 * 8 = 32 프레임의 구성 )
+    이 하나의 이미지 파일로 구성되어 있다.( 4 * 8 = 32 프레임의 구성 )
 */
 /*
 * sprite animation
@@ -88,11 +90,15 @@ class CRyuEngine : public CAPIEngine
     CTexture* mpTexBullet = nullptr;    //탄환 비트맵 이미지 데이터 자원
     CTexture* mpTexEnemy = nullptr;     //적 비트맵 데이터 자원
 
+    CTexture* mpTexExplosion = nullptr;
+
     //prefab
     //원본 객체( 주인공 기체의 원본 객체 )
     CUnit* PFActor = nullptr;
     CUnit* PFBullet = nullptr;          //탄환 원본 객체
     CUnit* PFEnemy = nullptr;           //적 원본 객체
+
+    CUnit* PFExplosion = nullptr;
 
     //object
     CActor* mpActor = nullptr;
@@ -100,6 +106,8 @@ class CRyuEngine : public CAPIEngine
 
     CEnemy* mpEnemy = nullptr;      //적 객체
     vector<CBullet*> mBulletsEnemy;      //실제 적 기체가 사용할 일반탄환객체들    
+
+    CExplosion* mpExplosion = nullptr;
 
 public:
     CRyuEngine() {};
@@ -147,8 +155,11 @@ public:
 
         mpTexEnemy = new CTexture();
         //대표이미지 교체
-        //mpTexEnemy->LoadTexture(hInst, mhDC, L"resources/bongenemy.bmp");
         mpTexEnemy->LoadTexture(hInst, mhDC, L"resources/paladin_idle_0.bmp");
+
+        mpTexExplosion = new CTexture();
+        //대표이미지 교체
+        mpTexExplosion->LoadTexture(hInst, mhDC, L"resources/explosionFull.bmp");
 
         PFActor = CreatePrefab<CActor>(mpTexture, 0.5f, 0.5f, SVector2D(800 * 0.5f, 600 - 50 - 100.0f));
         //이제  Animator객체를 추가하는 것을 프리팹 쪽으로 옮겼다.
@@ -157,28 +168,25 @@ public:
         tpAnimActor->AddAniSeq("ani_super_actor", 0.5f, 2, L"resources/bongbong_super");        //테스트용 애니시퀀스
 
         //기본 애니메이션 시퀀스 지정
-        //tpAnimActor->mStrKeyCurAniSeq = "ani_idle_actor";
         tpAnimActor->SetDefaultAniSeq("ani_idle_actor");
 
         PFBullet = CreatePrefab<CBullet>(mpTexBullet, 0.5f, 0.5f, SVector2D(800 * 0.5f, 600 - 50 - 100.0f));
 
         PFEnemy = CreatePrefab<CEnemy>(mpTexEnemy, 0.5f, 0.5f, SVector2D(800 * 0.5f, 100.0f));
         CAnimator* tpAnimEnemy = PFEnemy->CreateAnimation("AnimEnemy", this);
-        tpAnimEnemy->AddAniSeq("ani_idle_enemy", 0.03f, 7, L"resources/paladin_idle");
-        //tpAnimEnemy->AddAniSeq("ani_attack_enemy", 0.2f, 11, L"resources/paladin_attack",ANI_PO::ONCE);
-        tpAnimEnemy->AddAniSeq("ani_attack_enemy", 0.05f, 11, L"resources/paladin_attack", ANI_PO::ONCE);
+        tpAnimEnemy->AddAniSeq("ani_idle_enemy", 0.1f, 7, L"resources/paladin_idle");
+        tpAnimEnemy->AddAniSeq("ani_attack_enemy", 0.1f, 11, L"resources/paladin_attack", ANI_PO::ONCE);
 
         //기본 애니메이션 시퀀스 지정
         tpAnimEnemy->SetDefaultAniSeq("ani_idle_enemy");
+
+        PFExplosion = CreatePrefab<CExplosion>(mpTexExplosion, 0.5f, 0.5f, SVector2D(0.0f, 0.0f));
+        CAnimator* tpAnimExplosion = PFExplosion->CreateAnimation("AnimExplosion", this);
+        tpAnimExplosion->AddAniSeq("ani_explosion", 0.03f, 32, L"resources/explosionFull", ANI_PO::ONCE, ANI_SO::SHEET_FILE, 4, 8);
+        //한번만 재생, 스프라이트 시트 이용 옵션, 4행8열
+
+        tpAnimExplosion->SetDefaultAniSeq("ani_explosion");
         
-
-
-
-
-        //실제 객체 생성
-        //mpActor = static_cast<CActor*>(PFActor->clone());               //원본객체를 복제하여 객체를 생성
-        //mpActor->AddRef();
-
         mpActor = InstantObject<CActor>(PFActor);               //원본객체를 복제하여 객체를 생성
         mpActor->AddRef();
         
@@ -220,6 +228,11 @@ public:
             tpBullet = nullptr;
         }
 
+        mpExplosion = InstantObject<CExplosion>(PFExplosion);               //원본객체를 복제하여 객체를 생성
+        mpExplosion->AddRef();
+
+        mpExplosion->SetTag("tagExplosion");
+
         //입력 매핑 등록
         CInputMgr::GetInstance()->AddKey("OnMoveLt", 'A');
         CInputMgr::GetInstance()->AddKey("OnMoveRt", 'D');
@@ -245,18 +258,23 @@ public:
 
         DestroyObject<CActor>(mpActor);
 
+        DestroyObject<CExplosion>(mpExplosion);
+
         //원본 객체 소멸
         DestroyPrefab(PFEnemy);
         DestroyPrefab(PFBullet);
         DestroyPrefab(PFActor);
+        DestroyPrefab(PFExplosion);
 
         //자원 해제 
         SAFE_DELETE(mpTexEnemy)
         SAFE_DELETE(mpTexBullet)
         SAFE_DELETE(mpTexture)
+        SAFE_DELETE(mpTexExplosion)
 
         CAPIEngine::OnDestroy();
     }
+
     virtual void OnUpdate(float tDeltaTime) override
     {
         CAPIEngine::OnUpdate(tDeltaTime);
@@ -268,7 +286,6 @@ public:
             //순수한 방향의 속도 설정 (-1,0)
             tVelocity.mX = -1.0f;
             tVelocity.mY = 0.0f;
-            //mpUnit->SetVelocity(tVelocity * 0.1f);
             mpActor->SetVelocity(tVelocity * 350.0f);    //초당 350PIXEL
 
             OutputDebugString(L"key input A\n");
@@ -279,7 +296,6 @@ public:
             tVelocity.mX = +1.0f;
             tVelocity.mY = 0.0f;
 
-            //mpUnit->SetVelocity(tVelocity * 0.1f);
             mpActor->SetVelocity(tVelocity * 350.0f);    //초당 350PIXEL
 
             OutputDebugString(L"key input D\n");
@@ -308,7 +324,7 @@ public:
 
         //적 기체가 일반탄환을 일정시간 간격으로 발사
 
-        if ( mpEnemy->mTimeTick >= 2.0f )
+        if ( mpEnemy->mTimeTick >= 3.0f )
         {
             //todo 일정시간 간격으로 실행할 코드
             mpEnemy->DoFire(mBulletsEnemy);
@@ -329,6 +345,8 @@ public:
             (*tItor)->Update(tDeltaTime);
         }
 
+        mpExplosion->Update(tDeltaTime);
+
         //render
         this->Clear(0.1f, 0.1f, 0.3f);        
         
@@ -342,6 +360,8 @@ public:
         {
             (*tItor)->Render();
         }
+
+        mpExplosion->Render();
       
         this->Present();
     }
