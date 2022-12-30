@@ -11,6 +11,8 @@ public:
 	CExplosion(const CExplosion& t);
 	void operator=(const CExplosion& t);
 
+	virtual void LateUpdate();
+
 public:
 	//CExplosion타입의 객체를 복제하는 함수
 	//		복사 생성자를 이용하여 객체를 생성!!!!!!

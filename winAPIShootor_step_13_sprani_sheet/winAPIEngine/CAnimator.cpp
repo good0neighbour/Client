@@ -125,6 +125,10 @@ bool CAnimator::AddAniSeq(const string& tId, float tTimeInterval, int tTotalFram
 
 			tpTex->LoadTexture(mpEngine->GetHInstance(), mpEngine->GetHDC(), szTemp);
 			tpAniSeq->mTexs.push_back(tpTex);
+
+			//임의의 프레임의 너비, 높이르 결정
+			tpAniSeq->mSpriteWidth = tpAniSeq->mTexs[0]->mBitmapInfo.bmWidth / tCol;
+			tpAniSeq->mSpriteHeight = tpAniSeq->mTexs[0]->mBitmapInfo.bmHeight / tRow;
 		}
 	}
 	//프레임 N개가 하나의 파일에 담긴 경우

@@ -31,6 +31,8 @@
 
 #include "CExplosion.h"
 
+#include "CEfxMgr.h"
+
 //test
 #include <list>
 using namespace std;
@@ -232,6 +234,10 @@ public:
         mpExplosion->AddRef();
 
         mpExplosion->SetTag("tagExplosion");
+        mpExplosion->SetIsActive(false);
+
+        //등록 함수를 만들어도 된다.
+        CEfxMgr::GetInstance()->mpExplosion = mpExplosion;
 
         //입력 매핑 등록
         CInputMgr::GetInstance()->AddKey("OnMoveLt", 'A');

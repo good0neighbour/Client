@@ -180,9 +180,19 @@ void CUnit::Render()
 		}
 		else
 		{
+			//피벗을 고려하여 출력하기
+			mWidth = mpTexture->mBitmapInfo.bmWidth;
+			mHeight = mpTexture->mBitmapInfo.bmHeight;
+
+			//mDisplayX, mDisplayY 결정식
+			mDisplayX = mPosition.mX - mWidth * mAnchorX;
+			mDisplayY = mPosition.mY - mHeight * mAnchorY;
+
 			//대표이미지
 			mpEngine->DrawTexture(mDisplayX, mDisplayY, mpTexture);
 		}
+
+		LateUpdate();
 	}
 }
 

@@ -4,6 +4,9 @@
 
 #include <windows.h>
 
+#include "CEfxMgr.h"
+#include "CExplosion.h"
+
 CEnemy::CEnemy()
 {
     mCurIndexBullet = 0;
@@ -134,6 +137,27 @@ void CEnemy::DoFireCircled(vector<CBullet*>& tBullets)
         mCurIndexBullet = 0;
     }
 }
+
+void CEnemy::OnEnterCollision(CCollider* tOther)
+{
+    //태그 기능 적용
+    if ("tagEnemy" == this->GetTag() && "tagActorBullet" == tOther->GetOwnerObject()->GetTag())
+    {
+        OutputDebugString(L"CEnemy::OnEnterCollision\n");
+
+        //충돌처리
+
+        //적 비활성화
+        this->SetIsActive(false);
+
+        //상대 도 비활성화( 여기서는 주인공기체의 일반탄환 )
+        tOther->GetOwnerObject()->SetIsActive(false);
+
+        //해당 위치에, 폭발 이펙트 애니메이션 활성화
+        CEfxMgr::GetInstance()->mpExplosion->SetPosition(this->GetPosition());
+        CEfxMgr::GetInstance()->mpExplosion->SetIsActive(true);
+    }
+};
 
 void CEnemy::OnTimer()
 {
