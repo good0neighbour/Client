@@ -17,7 +17,7 @@ int mGrid[MAX_ROW][MAX_COL] =
 	2, 2, 2, 2, 2, 2,
 };
 
-typedef stack<int> CIntStack;
+typedef stack<int> CIntStack;	//행, 열 위치 정보를 기억시켜둘 자료구조, 스택 LIFO Last Input First Output
 
 CIntStack mIntStack;	//행, 열 위치 정보를 기억시켜둘 자료구조
 
@@ -33,7 +33,8 @@ int main()
 	DisplayGrid();
 
 	//flood fill 적용
-	DoFloodFill(1, 1);
+	//DoFloodFill(1, 1);
+	DoFloodFillNoRecur(1, 4);
 
 	cout << endl;
 	//after
@@ -87,7 +88,43 @@ void DoFloodFill(int tCol, int tRow)
 
 void DoFloodFillNoRecur(int tCol, int tRow)
 {
+	//seed
+	//자료구조에 위치 정보 1개 넣는다
+	mIntStack.push(tCol);
+	mIntStack.push(tRow);
 
+	//스택 자료구조에 행, 열 위치정보가 하나라도 있다면
+	while (!mIntStack.empty())
+	{
+		tRow = mIntStack.top();
+		mIntStack.pop();
+
+		tCol = mIntStack.top();
+		mIntStack.pop();
+
+		//이미 칠했거나 벽(경계)라면 칠하지 않는다
+		if (1 == mGrid[tRow][tCol] || 2 == mGrid[tRow][tCol])
+		{
+			continue;
+		}
+
+		//칠한다
+		mGrid[tRow][tCol] = 1;
+
+		//상하좌우 사방의 위치 정보를 스택 자료구조에 넣는다.
+		//좌
+		mIntStack.push(tCol - 1);
+		mIntStack.push(tRow);
+		//우
+		mIntStack.push(tCol + 1);
+		mIntStack.push(tRow);
+		//상
+		mIntStack.push(tCol);
+		mIntStack.push(tRow - 1);
+		//하
+		mIntStack.push(tCol);
+		mIntStack.push(tRow + 1);
+	}
 }
 
 //#include <iostream>
