@@ -17,9 +17,9 @@ int mGrid[MAX_ROW][MAX_COL] =
 	2, 2, 2, 2, 2, 2,
 };
 
-typedef stack<int> CIntStack;	//행, 열 위치 정보를 기억시켜둘 자료구조, 스택 LIFO Last Input First Output
+typedef stack<int> CIntStack;	//행, 열 위치 정보를 기억시켜둘 자료구조
 
-CIntStack mIntStack;	//행, 열 위치 정보를 기억시켜둘 자료구조
+CIntStack mIntStack;	//행, 열 위치 정보를 기억시켜둘 자료구조, 스택 LIFO Last Input First Output
 
 void DisplayGrid();
 //재귀버전

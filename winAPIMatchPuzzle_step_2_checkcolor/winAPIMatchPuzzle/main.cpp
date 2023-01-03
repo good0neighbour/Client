@@ -8,34 +8,17 @@
 #include "CPiece.h"
 #include "CSelect.h"
 
+#include <stack>
+using namespace std;
+
 /*
-* 이번 스텝에서는 '게임보드'를 만들고 셀들에 퍼즐 피스를 배치하자.
+* 이번 스텝에서는
+*   color match 게임 알고리즘의 기본을 만들어보자.
 * 
-* 이 예시는 3컬러 매치 퍼즐 알고리즘 테스트를 위해
+* DoFloodFill의 비재귀 버전을 가져와 변형하겠다.
 * 
-* '격자 형태로 퍼즐 피스를 나열하고(셀들에)
-* 플레이어의 선택UI를 표시하는 기능을 가진다'
-* 
-* 요구사항 가정
-* 
-* -게임보드는 Grid라고 칭하고 5by5 크기를 가정한다.
-* -셀(타일) 1개의 픽셀 단위 크기는 96by96 로 가정
-* -게임보드의 시작위치는 left, top 100, 100에서 시작
-* 
-* 다음의 두 개의 클래스를 준비하자.
-* 
-* CPiece
-* 
-*   퍼즐조각<--퍼즐 조각은 색상별로 준비
-* 
-*   <-- 퍼즐 피스가 그리드에 배치된 상태에서
-*   대기애니메이션을 수행한다는 요구사항이 있다고 가정하고
-*   퍼즐 피스 하나의 애니메이션 시퀀스 하나를 대응시켜 제작하겠다.
-*   (<-- 물론 다르게 설계도 가능하다)
-* 
-* CSelect
-* 
-*   임의의 셀을 선택했다는 표시
+* 멤버함수
+* DoCheckCellAttrib 를 정의하자.
 */
 
 class CRyuEngine : public CAPIEngine
@@ -61,7 +44,7 @@ class CRyuEngine : public CAPIEngine
     string mColor[6] = { "BLACK", "PINK", "RED", "GREEN", "BLUE", "YELLOW" };
 
     //임의의 색상의 퍼즐 피스 25개 배치된 게임보드 속성
-    unsigned int mBoarAttrib[5][5] =
+    unsigned int mBoardAttrib[5][5] =
     {
         5, 5, 1, 1, 3,
         5, 2, 2, 2, 3,
@@ -73,6 +56,9 @@ class CRyuEngine : public CAPIEngine
     //선택UI의 위치정보, 행, 열기준 좌표
     int mCurX = 0;
     int mCurY = 0;
+
+    typedef stack<int> CIntStack;	//행, 열 위치 정보를 기억시켜둘 자료구조
+    CIntStack mIntStack;	//행, 열 위치 정보를 기억시켜둘 자료구조
 
     //눈에 보이는 데이터
     //퍼즐 피스 객체
@@ -196,6 +182,14 @@ private:
         if (CInputMgr::GetInstance()->KeyUp("OnSelectHit"))
         {
             OutputDebugString(L"==========OnSelectHit==========\n");
+
+            int tColorIndex = mBoardAttrib[mCurY][mCurX];
+
+            WCHAR szTemp[256] = { 0 };
+            wsprintf(szTemp, L"color index: %d\n", tColorIndex);
+            OutputDebugString(szTemp);
+
+            DoCheckCellAttrib(mCurX, mCurY, tColorIndex);
         }
 
         //update
@@ -216,7 +210,7 @@ private:
                 mPieceBoard[tRow][tCol]->SetPosition(SVector2D((float)tX, (float)tY));
 
                 //어느 색상의 퍼즐 피스인가 결정
-                int tColorIndex = mBoarAttrib[tRow][tCol];
+                int tColorIndex = mBoardAttrib[tRow][tCol];
 
                 string tColorString = mColor[tColorIndex];
 
@@ -243,6 +237,102 @@ private:
         mpUISelect->Render();
 
         this->Present();
+    }
+
+    /*
+    * 이 함수의 기능은
+    * 임의의 색상이 연속되어 나오는지 검사하는 기능이다.
+    * 
+    * 이를 위하여 해당 게임 알고리즘에서 검토해야 하는 것은 세 가지 정도다.
+    * 
+    * i) 색상을 검사한 곳은 검사했다고 '체크'해둔다.<-- 이미 체크해둔 곳은 체크하지 않는다
+    * ii) 검사한 셀이 다른 색이라면 '체크'하지 않는다
+    * iii) 검사한 셀이 경계를 벗어난 곳이라면 '체크'하지 않는다
+    */
+    void DoCheckCellAttrib(int tCol, int tRow, int tColorIndex)
+    {
+        // 검사 여부 체크 보드
+        //0: 체크 안됨, 1: 체크됨
+        unsigned int mCheckVisit[5][5] =
+        {
+            0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0
+        };
+
+        //clean stack
+        while (!mIntStack.empty())
+        {
+            mIntStack.pop();
+        }
+
+        //build stack
+
+        //seed
+        //자료구조에 위치 정보 1개 넣는다
+        mIntStack.push(tCol);
+        mIntStack.push(tRow);
+
+        //스택 자료구조에 행, 열 위치정보가 하나라도 있다면
+        while (!mIntStack.empty())
+        {
+            //LIFO
+            tRow = mIntStack.top();
+            mIntStack.pop();
+
+            tCol = mIntStack.top();
+            mIntStack.pop();
+
+            //=================================
+            //상하 경계 처리, 경계를 벗어났으면 체크하지 않는다
+            if (tRow < 0 || tRow > 4)
+            {
+                continue;
+            }
+            //좌우 경걔처리, 경계를 벗어났으면 체크하지 않는다
+            if (tCol < 0 || tCol > 4)
+            {
+                continue;
+            }
+
+            //다른 색상이라면, 체크하지 않는다
+            if (tColorIndex != mBoardAttrib[tRow][tCol])
+            {
+                continue;
+            }
+
+
+            //이미 체크해둔 것이라면, 체크하지 않는다
+            if (1 == mCheckVisit[tRow][tCol])
+            {
+                continue;
+            }
+
+            //=================================
+
+            WCHAR szTemp[256] = { 0 };
+            wsprintf(szTemp, L"remember CELL: %d, %d\n", tRow, tCol);
+            OutputDebugString(szTemp);
+
+            //체크한다.
+            mCheckVisit[tRow][tCol] = 1;
+
+            //상하좌우 사방의 위치 정보를 스택 자료구조에 넣는다.
+            //좌
+            mIntStack.push(tCol - 1);
+            mIntStack.push(tRow);
+            //우
+            mIntStack.push(tCol + 1);
+            mIntStack.push(tRow);
+            //상
+            mIntStack.push(tCol);
+            mIntStack.push(tRow - 1);
+            //하
+            mIntStack.push(tCol);
+            mIntStack.push(tRow + 1);
+        }
     }
 };
 
