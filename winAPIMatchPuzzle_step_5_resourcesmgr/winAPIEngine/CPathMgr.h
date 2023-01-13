@@ -6,7 +6,6 @@
 #include "config.h"
 
 #include <string>
-
 #include <unordered_map>	//해쉬 자료구조를 STL컨테이너로 만든 것
 using namespace std;
 /*
@@ -31,7 +30,7 @@ public:
 	//임의의 경로를 만들어 자료구조에 추가한다
 	bool MakePath(const string& tStrKey, const wchar_t* tpPath, const string& tStrBaseKey = ROOT);
 
-private:
+//private:
 	//리턴값은 C 스타일 유니코드 문자열 (window api는 c를 지원하므로 리턴타입을 이렇게 결정했다 )
 	const wchar_t* FindPath(const string& tStrKey);
 

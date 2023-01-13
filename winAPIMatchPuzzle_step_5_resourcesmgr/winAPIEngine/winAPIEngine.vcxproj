@@ -153,6 +153,7 @@
     <ClInclude Include="config.h" />
     <ClInclude Include="CPathMgr.h" />
     <ClInclude Include="CRef.h" />
+    <ClInclude Include="CResourcesMgr.h" />
     <ClInclude Include="CTexture.h" />
     <ClInclude Include="CUnit.h" />
     <ClInclude Include="framework.h" />
@@ -171,6 +172,7 @@
     <ClCompile Include="CObjectRyu.cpp" />
     <ClCompile Include="CPathMgr.cpp" />
     <ClCompile Include="CRef.cpp" />
+    <ClCompile Include="CResourcesMgr.cpp" />
     <ClCompile Include="CTexture.cpp" />
     <ClCompile Include="CUnit.cpp" />
     <ClCompile Include="SVector2D.cpp" />

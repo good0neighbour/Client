@@ -14,18 +14,16 @@ using namespace std;
 /*
 * 이번 스텝에서는
 * 
-*   경로 관리자를 작성해보자
+*   자원(외부 파일) 관리자 Resources Manager 를 작성하도록 하자.
 * 
-*   경로 관리자 Path Manager: 외부파일 자원들이 위피할 '경로'를 관리할 객체
+* Resources Manager를 작성하려고 하는 이유는 다음과 같다.
 * 
-*   실행파일(프로그램)이 있는 곳을 기준으로 하여 그곳을 root폴더로 삼고
-*   그에 상대적인 경로를 가져와 관리하자.
+*   i) 리소스들을 한 객체에서 관리하자
+*   ii) 리소스들을 로드하여 메모리에 적재하는 부분과
+*   그 리소스들을 접근하여 사용하는 부분을 명확히 분리하자
 * 
-*   임의의 경로 = 실행파일이 있는 곳은 root폴더 + root폴더에서 그 하위에 있는 폴더
+*   CResourcesMgr
 * 
-* CPathMgr
-* 
-* 리소스 관리자를 만드는 전단계로 삼자.
 */
 
 class CRyuEngine : public CAPIEngine
