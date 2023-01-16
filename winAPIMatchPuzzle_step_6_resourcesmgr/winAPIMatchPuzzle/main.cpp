@@ -14,16 +14,8 @@ using namespace std;
 /*
 * 이번 스텝에서는
 * 
-*   자원(외부 파일) 관리자 Resources Manager 를 작성하도록 하자.
-* 
-* Resources Manager를 작성하려고 하는 이유는 다음과 같다.
-* 
-*   i) 리소스들을 한 객체에서 관리하자
-*   ii) 리소스들을 로드하여 메모리에 적재하는 부분과
-*   그 리소스들을 접근하여 사용하는 부분을 명확히 분리하자
-* 
-*   CResourcesMgr
-* 
+*   ResourcesMgr을 이용한 형태로 코드를 '모두 정리하여' 수정하자.
+*   <-- 이렇게 얘기했지만 사실 기존에 CTexture::LoadTexture함수를 호출받아
 */
 
 class CRyuEngine : public CAPIEngine
@@ -109,27 +101,50 @@ private:
 
         CInputMgr::GetInstance()->AddKey("OnSelectHit", VK_SPACE);
 
+        //  '파일'에서 자원 데이터를 로드(메모리)하여 자원관리자에 등록
+        //======================================================
         //외부자원 로드
         //대표이미지
-        mpTexPiece = new CTexture();
-        mpTexPiece->LoadTexture(hInst, mhDC, L"resources/block_0.bmp");
+        //mpTexPiece = new CTexture();
+        //mpTexPiece->LoadTexture(hInst, mhDC, L"resources/block_0.bmp");
+        CTexture* tpTex = nullptr;
 
-        //  '파일'에서 자원 데이터를 로드(메모리)하여 자원관리자에 등록
-        //mpTexUISelect = new CTexture();
-        //mpTexUISelect->LoadTexture(hInst, mhDC, L"resources/select_0.bmp");
-        CTexture* tpTex = CResourcesMgr::GetInstance()->LoadTexture("select_0", L"select_0.bmp", RSC);
+        for (int ti = 0; ti < 6; ++ti)
+        {
+            WCHAR szTemp[256] = { 0 };
+            wsprintf(szTemp, L"block_%d.bmp", ti);
+
+            //자원의 식별자도 색상 식별자와 똑같이 맞추도록 하겠다
+            tpTex = CResourcesMgr::GetInstance()->LoadTexture(mColor[ti], szTemp, RSC);
+
+            if (!tpTex)
+            {
+                OutputDebugString(L"resources load failed.\n");
+                return;
+            }
+        }
+
+        tpTex = CResourcesMgr::GetInstance()->LoadTexture("select_0", L"select_0.bmp", RSC);
         if (!tpTex)
         {
             OutputDebugString(L"resources load failed.\n");
-
             return;
         }
 
+        tpTex = CResourcesMgr::GetInstance()->LoadTexture("select_1", L"select_1.bmp", RSC);
+        if (!tpTex)
+        {
+            OutputDebugString(L"resources load failed.\n");
+            return;
+        }
+        //======================================================
+        
         //실제로 사용하기 위해 자원관리자에 질의하여 자원데이터(메모리)에 접근하는 부분
-        mpTexUISelect = CResourcesMgr::GetInstance()->FindTexture("select_0");
+        //mpTexUISelect = CResourcesMgr::GetInstance()->FindTexture("select_0");
+        //mpTexUISelect = FIND_TEX("select_0");
 
         //퍼즐 피스의 색상종류를 애니메이션 시퀀스에 대응시킴
-        PFPiece = CreatePrefab<CPiece>(mpTexPiece, 0.5f, 0.5f, SVector2D(0.0f, 0.0f));
+        PFPiece = CreatePrefab<CPiece>(FIND_TEX("block_0"), 0.5f, 0.5f, SVector2D(0.0f, 0.0f));
         CAnimator* tpAnimPiece = PFPiece->CreateAnimation("AnimPiece", this);
         tpAnimPiece->AddAniSeq("BLACK", 0.0f, 1, L"resources/block_0", ANI_PO::LOOP, ANI_SO::SHEET_FILE);
         tpAnimPiece->AddAniSeq("PINK", 0.0f, 1, L"resources/block_1", ANI_PO::LOOP, ANI_SO::SHEET_FILE);
@@ -139,14 +154,14 @@ private:
         tpAnimPiece->AddAniSeq("YELLOW", 0.0f, 1, L"resources/block_5", ANI_PO::LOOP, ANI_SO::SHEET_FILE);
         tpAnimPiece->SetDefaultAniSeq("BLACK");
 
-        PFUISelect = CreatePrefab<CSelect>(mpTexUISelect, 0.5f, 0.5f, SVector2D(0.0f, 0.0f));
+        PFUISelect = CreatePrefab<CSelect>(FIND_TEX("select_0"), 0.5f, 0.5f, SVector2D(0.0f, 0.0f));
         //'대기', '클릭' 두 경우의 애니메이션 시퀀스를 만든다
         CAnimator* tpAnimSelect = PFUISelect->CreateAnimation("AnimSelect", this);
-        tpAnimSelect->AddAniSeq("IDLE", 0.0f, 1, L"resources/select_0", ANI_PO::LOOP, ANI_SO::SHEET_FILE);
-        tpAnimSelect->AddAniSeq("SELECT", 0.3f, 2, L"resources/select", ANI_PO::LOOP, ANI_SO::FRAME_FILE);
+        tpAnimSelect->AddAniSeq("select_0", 0.0f, 1, L"resources/select_0", ANI_PO::LOOP, ANI_SO::SHEET_FILE);
+        tpAnimSelect->AddAniSeq("select", 0.3f, 2, L"resources/select", ANI_PO::LOOP, ANI_SO::FRAME_FILE);
         //tpAnimSelect->AddAniSeq("SELECT", 0.3f, 2, L"resources/select", ANI_PO::ONCE, ANI_SO::FRAME_FILE);
         //tpAnimSelect->SetDefaultAniSeq("IDLE");
-        tpAnimSelect->SetDefaultAniSeq("SELECT");
+        tpAnimSelect->SetDefaultAniSeq("select");
 
         //실제 객체 생성
         for (int tRow = 0; tRow < 5; ++tRow)
