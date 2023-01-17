@@ -158,10 +158,10 @@ private:
         //'대기', '클릭' 두 경우의 애니메이션 시퀀스를 만든다
         CAnimator* tpAnimSelect = PFUISelect->CreateAnimation("AnimSelect", this);
         tpAnimSelect->AddAniSeq("select_0", 0.0f, 1, L"resources/select_0", ANI_PO::LOOP, ANI_SO::SHEET_FILE);
-        tpAnimSelect->AddAniSeq("select", 0.3f, 2, L"resources/select", ANI_PO::LOOP, ANI_SO::FRAME_FILE);
+        tpAnimSelect->AddAniSeq("select", 0.3f, 2, L"resources/select", ANI_PO::ONCE, ANI_SO::FRAME_FILE);
         //tpAnimSelect->AddAniSeq("SELECT", 0.3f, 2, L"resources/select", ANI_PO::ONCE, ANI_SO::FRAME_FILE);
         //tpAnimSelect->SetDefaultAniSeq("IDLE");
-        tpAnimSelect->SetDefaultAniSeq("select");
+        tpAnimSelect->SetDefaultAniSeq("select_0");
 
         //실제 객체 생성
         for (int tRow = 0; tRow < 5; ++tRow)
@@ -228,52 +228,7 @@ private:
 
         if (CInputMgr::GetInstance()->KeyUp("OnSelectHit"))
         {
-            OutputDebugString(L"==========OnSelectHit==========\n");
-
-            int tColorIndex = mBoardAttrib[mCurY][mCurX];
-
-            WCHAR szTemp[256] = { 0 };
-            wsprintf(szTemp, L"color index: %d\n", tColorIndex);
-            OutputDebugString(szTemp);
-
-            int tPieceCount = DoCheckCellAttrib(mCurX, mCurY, tColorIndex);
-
-            if (tPieceCount >= 3)
-            {
-                WCHAR szTemp_0[256] = { 0 };
-                wsprintf(szTemp_0, L"continuous color pieces count: %d\n", tPieceCount);
-                OutputDebugString(szTemp_0);
-
-                //ClearPieces
-
-                for (int tRow = 0; tRow < 5; ++tRow)
-                {
-                    for (int tCol = 0; tCol < 5; ++tCol)
-                    {
-                        //선별한 퍼즐 피스라면
-                        if (1 == mCheckVisit[tRow][tCol])
-                        {
-                            //해당 퍼즐 피스들을 삭제
-                            mBoardAttrib[tRow][tCol] = 0;
-                        }
-                    }
-                }
-
-                //SpawnNewPiece;
-                for (int tRow = 0; tRow < 5; ++tRow)
-                {
-                    for (int tCol = 0; tCol < 5; ++tCol)
-                    {
-                        if (0 == mBoardAttrib[tRow][tCol])
-                        {
-                            //우리가 원하는 퍼즐 조각의 색상은 [1, 5]까지다.
-                            int tRandColor = rand() % 5 + 1;
-
-                            mBoardAttrib[tRow][tCol] = tRandColor;
-                        }
-                    }
-                }
-            }
+            DoSelectHit();
         }
 
         //마우스 처리
@@ -348,14 +303,53 @@ private:
             }
         }
 
-        int tX = tBoardStartX + mCurX * 96;    //<-- mCurX 는 열
-        int tY = tBoardStartY + mCurY * 96;    //<-- mCurY 는 행
+        //int tX = tBoardStartX + mCurX * 96;    //<-- mCurX 는 열
+        //int tY = tBoardStartY + mCurY * 96;    //<-- mCurY 는 행
+        //mpUISelect->SetPosition(SVector2D(tX, tY));
+        //mpUISelect->Update(tDeltaTime);
+
+        //마우스 이동에 관한 처리
+        POINT tPoint;
+        GetCursorPos(&tPoint);
+        ScreenToClient(this->mhWnd, &tPoint);
+
+        //i) 게임 보드 판 위치에 맞게 마우스 위치 조정
+        tPoint.x = -tBoardStartX + tPoint.x + 96 * 0.5f;
+        tPoint.y = -tBoardStartY + tPoint.y + 96 * 0.5f;
+        //ii) 픽셀 단위의 위치를 행, 열 단위의 위치로 변환
+        mCurX = tPoint.x / 96;  //행
+        mCurY = tPoint.y / 96;  //열
+
+        //경계처리
+        if (mCurX < 0)
+        {
+            mCurX = 0;
+        }
+        if (mCurX > 4)
+        {
+            mCurX = 4;
+        }
+
+        if (mCurY < 0)
+        {
+            mCurY = 0;
+        }
+        if (mCurY > 4)
+        {
+            mCurY = 4;
+        }
+
+        //iii) 해당 행과 열 위치에 있는 퍼즐 조각의 픽셀위치를 지정
+        int tX = mCurX * 96 + tBoardStartX;
+        int tY = mCurY * 96 + tBoardStartY;
+
         mpUISelect->SetPosition(SVector2D(tX, tY));
         mpUISelect->Update(tDeltaTime);
 
         //step_2
         if (CInputMgr::GetInstance()->KeyUp("OnMouseL"))
         {
+            //마우스 클릭에 관한 처리
             POINT tPoint;
             GetCursorPos(&tPoint);
             ScreenToClient(this->mhWnd, &tPoint);
@@ -368,16 +362,23 @@ private:
                     CPiece* tpPiece = nullptr;
                     tpPiece = mPieceBoard[tRow][tCol];
 
-                    /*tRect.left = ;
-                    tRect.top = ;
-                    tRect.right = ;
-                    tRect.bottom = ;*/
+                    tRect.left = tpPiece->GetPosition().mX - tpPiece->GetWidth() * tpPiece->GetAnchorX();
+                    tRect.top = tpPiece->GetPosition().mY - tpPiece->GetHeight() * tpPiece->GetAnchorY();
+                    tRect.right = tpPiece->GetPosition().mX + tpPiece->GetWidth() * tpPiece->GetAnchorX();
+                    tRect.bottom = tpPiece->GetPosition().mY + tpPiece->GetHeight() * tpPiece->GetAnchorY();
 
                     //점 vs 사각형 충돌 감지
                     if (tRect.left <= tPoint.x && tRect.right >= tPoint.x &&
                         tRect.top <= tPoint.y && tRect.bottom >= tPoint.y)
                     {
+                        //DoSelectHit
                         OutputDebugString(L"point vs rect collision\n");
+
+                        mpUISelect->PlayAni("select");
+
+                        DoSelectHit();
+
+                        break;
                     }
                 }
             }
@@ -399,6 +400,55 @@ private:
         this->Present();
     }
 
+    void DoSelectHit()
+    {
+        OutputDebugString(L"==========OnSelectHit==========\n");
+
+        int tColorIndex = mBoardAttrib[mCurY][mCurX];
+
+        WCHAR szTemp[256] = { 0 };
+        wsprintf(szTemp, L"color index: %d\n", tColorIndex);
+        OutputDebugString(szTemp);
+
+        int tPieceCount = DoCheckCellAttrib(mCurX, mCurY, tColorIndex);
+
+        if (tPieceCount >= 3)
+        {
+            WCHAR szTemp_0[256] = { 0 };
+            wsprintf(szTemp_0, L"continuous color pieces count: %d\n", tPieceCount);
+            OutputDebugString(szTemp_0);
+
+            //ClearPieces
+
+            for (int tRow = 0; tRow < 5; ++tRow)
+            {
+                for (int tCol = 0; tCol < 5; ++tCol)
+                {
+                    //선별한 퍼즐 피스라면
+                    if (1 == mCheckVisit[tRow][tCol])
+                    {
+                        //해당 퍼즐 피스들을 삭제
+                        mBoardAttrib[tRow][tCol] = 0;
+                    }
+                }
+            }
+
+            //SpawnNewPiece;
+            for (int tRow = 0; tRow < 5; ++tRow)
+            {
+                for (int tCol = 0; tCol < 5; ++tCol)
+                {
+                    if (0 == mBoardAttrib[tRow][tCol])
+                    {
+                        //우리가 원하는 퍼즐 조각의 색상은 [1, 5]까지다.
+                        int tRandColor = rand() % 5 + 1;
+
+                        mBoardAttrib[tRow][tCol] = tRandColor;
+                    }
+                }
+            }
+        }
+    }
     /*
     * 이 함수의 기능은
     * 임의의 색상이 연속되어 나오는지 검사하는 기능이다.
