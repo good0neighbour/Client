@@ -31,12 +31,18 @@ public:
 
 	virtual void LateUpdate() {};
 
+
+
 	virtual void OnTimer() {};
 
 	//충돌 처리 프로그램 구조를 다형성을 이용하여 작성함
 	virtual void OnEnterCollision(CCollider* tOther) {};
 	virtual void OnStayCollision(CCollider* tOther) {};
 	virtual void OnExitCollision(CCollider* tOther) {};
+
+
+	
+
 
 	inline void SetPosition(SVector2D tPosition)
 	{
@@ -75,10 +81,17 @@ public:
 		mpTexture = tpTexture;
 	}
 
+
 	inline void SetVelocity(SVector2D tVelocity)
 	{
 		mVelocity = tVelocity;
 	}
+
+	inline const SVector2D GetVelocity() const
+	{
+		return mVelocity;
+	}
+
 
 	inline void SetIsActive(bool tIsActive)
 	{
@@ -89,6 +102,7 @@ public:
 	{
 		return mIsActive;
 	}
+
 
 	inline float GetAnchorX()
 	{
@@ -116,6 +130,61 @@ public:
 		return mTag;
 	}
 
+	/*
+	bool Intersects(CUnit& t) 
+	{
+		//A 사각형
+		float tLeftX = 0.0f;
+		float tRightX = 0.0f;
+		float tTopY = 0.0f;
+		float tBottomY = 0.0f;
+
+
+		tLeftX = mPosition.mX - GetWidth() * GetAnchorX();
+		tRightX = mPosition.mX - GetWidth() * GetAnchorX() + GetWidth();
+		tTopY = mPosition.mY - GetHeight() * GetAnchorY();
+		tBottomY = mPosition.mY - GetHeight() * GetAnchorY() + GetHeight();
+
+		//B 사각형
+		float tLeftX_Other = 0.0f;
+		float tRightX_Other = 0.0f;
+		float tTopY_Other = 0.0f;
+		float tBottomY_Other = 0.0f;
+
+		tLeftX_Other = t.GetPosition().mX - t.GetWidth() * t.GetAnchorX();
+		tRightX_Other = t.GetPosition().mX - t.GetWidth() * t.GetAnchorX() + t.GetWidth();
+		tTopY_Other = t.GetPosition().mY - t.GetHeight() * t.GetAnchorY();
+		tBottomY_Other = t.GetPosition().mY - t.GetHeight() * t.GetAnchorY() + t.GetHeight();
+
+		if (tRightX < tLeftX_Other)
+		{
+			return false;
+		}
+
+		if (tLeftX > tRightX_Other)
+		{
+			return false;
+		}
+
+		if (tBottomY < tTopY_Other)
+		{
+			return false;
+		}
+
+		if (tTopY > tBottomY_Other)
+		{
+			return false;
+		}
+
+		//위의 경우들을 모두 거치고 여기까지 왔다면, 충돌인 경우이다.
+		return true;
+	}
+	*/
+
+
+
+
+//public:
 private:
 	//2차원, 연속적인 공간을 가정하여 데이터와 타입을 디자인했다.
 	SVector2D mVelocity;

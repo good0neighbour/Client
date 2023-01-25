@@ -56,4 +56,4 @@ void p::ReleaseInstance()\
 
 
 
-#define FIND_TEX(p) CResourcesMgr::GetInstance()->FindTexture(p)
+#define FIND_TEX(p) CResourcesMgr::GetInstance()->FindTexture(p) 

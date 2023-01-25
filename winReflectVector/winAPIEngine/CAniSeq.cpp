@@ -18,14 +18,15 @@ CAniSeq::CAniSeq()
     mAniTime = 0.0f;
 
     mPlayOption = ANI_PO::LOOP;
-    mSpriteOption = ANI_SO::FRAME_FILE;
+    mSpriteOption = ANI_SO::FRAME_FILE;          
 
-    mSpriteWidth = 0;
-    mSpriteHeight = 0;
 
-    mRow = 0;
-    mCol = 0;
-    mFrameCOL = 0;
+    mSpriteWidth = 0;       
+    mSpriteHeight = 0;      
+
+    mRow = 0;           
+    mCol = 0;               
+    mFrameCOL = 0;         
 }
 CAniSeq::~CAniSeq()
 {
@@ -61,6 +62,7 @@ CAniSeq::CAniSeq(const CAniSeq& t)
     mPlayOption = t.mPlayOption;
     mSpriteOption = t.mSpriteOption;
 
+
     mSpriteWidth = t.mSpriteWidth;
     mSpriteHeight = t.mSpriteHeight;
 
@@ -85,6 +87,7 @@ void CAniSeq::operator=(const CAniSeq& t)
 
     mPlayOption = t.mPlayOption;
     mSpriteOption = t.mSpriteOption;
+
 
     mSpriteWidth = t.mSpriteWidth;
     mSpriteHeight = t.mSpriteHeight;

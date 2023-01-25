@@ -4,7 +4,9 @@
 #include <string>
 using namespace std;
 
+
 class CTexture;
+
 
 //열거형 문법
 //열거형 <-- 값을 미리 지정하여 나열해둔 타입type
@@ -14,11 +16,12 @@ enum ANI_PO         //play option
     ONCE                //한번만 플레이 옵션 
 };
 
-enum ANI_SO //sprite sheet option
+enum ANI_SO     //sprite sheet option
 {
-    FRAME_FILE = 0, //스프라이트 프레임이 파일 단위로 구성
-    SHEET_FILE      //스프라이트 프레임들이 하나의 스프라이트 시트 파일안에 구성
+    FRAME_FILE = 0,     //스프라이트 프레임이 파일 단위로 구성
+    SHEET_FILE              //스프라이트 프레임들이 하나의 스프라이트 시트 파일안에 구성
 };
+
 
 class CAniSeq
 {
@@ -29,6 +32,7 @@ public:
     CAniSeq(const CAniSeq& t);
 
     void operator=(const CAniSeq& t);
+
 
     //애니메이션 시퀀스 진행
     void Update(float tDeltaTime);
@@ -53,13 +57,15 @@ public:
     ANI_PO mPlayOption = ANI_PO::LOOP;
 
     //스프라이트 시트 옵션 변수
-    ANI_SO mSpriteOption = ANI_SO::FRAME_FILE;  //프레임 하나에 파일 하나가 기본
+    ANI_SO mSpriteOption = ANI_SO::FRAME_FILE;          //프레임 하나에 파일 하나 가 기본
 
-    int mSpriteWidth = 0;   //스프라이트 프레임의 너비
-    int mSpriteHeight = 0;  //스프라이트 프레임의 높이
 
-    int mRow = 0;   //행
-    int mCol = 0;   //열
-    int mFrameCOL = 0;  //스프라이트 프레임
+    int mSpriteWidth = 0;       //스프라이트 프레임의 너비
+    int mSpriteHeight = 0;      //스프라이트 프레임의 높이
+
+    int mRow = 0;           //행
+    int mCol = 0;               //열
+    int mFrameCOL = 0;          //
+
 };
 

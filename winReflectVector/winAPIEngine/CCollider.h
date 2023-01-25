@@ -22,11 +22,14 @@ public:
 
 	void operator=(const CCollider& t);
 
+
 public:
 	bool DoCollision(CCollider* tOther);
 
-	void Create(SVector2D tPosition, float tWidth =64.0f, float tHeight = 64.0f, float tAnchorX = 0.5f, float tAnchorY=0.5f);
+
+	void Create(SVector2D tPosition, float tWidth =100.0f, float tHeight = 100.0f, float tAnchorX = 0.5f, float tAnchorY=0.5f);
 	void Update();
+
 
 	//충돌체 목록에 충돌체 등록
 	void AddToCollisions(CCollider* tpCollider);
@@ -34,6 +37,9 @@ public:
 	void EraseFromCollisions(CCollider* tpCollider);
 	//임의의 충돌체가 충돌체 목록에 들어있는지 검토
 	bool DoCheckBeInCollisions(CCollider* tpCollider);
+
+
+
 
 	inline SVector2D GetPosition()
 	{

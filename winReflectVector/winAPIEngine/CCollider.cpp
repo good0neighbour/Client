@@ -46,6 +46,8 @@ bool CCollider::DoCollision(CCollider* tOther)
 	return tResult;
 }
 
+
+
 void CCollider::Create(SVector2D tPosition, float tWidth, float tHeight, float tAnchorX, float tAnchorY)
 {
 	mPosition = tPosition;
@@ -90,6 +92,8 @@ bool CCollider::DoCheckBeInCollisions(CCollider* tpCollider)
 
 	return false;
 }
+
+
 
 bool CCollider::DoCollisionAABB(CCollider* tOther)
 {

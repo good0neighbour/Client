@@ -5,7 +5,9 @@
 
 #include "CInputMgr.h"
 
+
 //HINSTANCE CAPIEngine::hInst = nullptr;
+
 
 CAPIEngine::CAPIEngine()
 {
@@ -24,8 +26,8 @@ BOOL CAPIEngine::Create(HINSTANCE hInstance, int nCmdShow)
     //LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     //LoadStringW(hInstance, IDC_WINAPIENGINE, szWindowClass, MAX_LOADSTRING);
 
-    lstrcpyW(szTitle, L"winAPIPuzzleMach Title");
-    lstrcpyW(szWindowClass, L"winAPIPuzzleMach");
+    lstrcpyW(szTitle, L"winMatchPuzzle Title");
+    lstrcpyW(szWindowClass, L"winMatchPuzzle");
 
     MyRegisterClass(hInstance);
 
@@ -37,6 +39,30 @@ BOOL CAPIEngine::Create(HINSTANCE hInstance, int nCmdShow)
 
     return TRUE;
 }
+//MSG CAPIEngine::Run()
+//{
+//    OnCreate();     //<--상속구조에 다형성을 이용한다
+//
+//
+//    HACCEL hAccelTable = LoadAccelerators(hInst, MAKEINTRESOURCE(IDC_WINAPIENGINE));
+//
+//    MSG msg = { 0 };    //MSG구조체 타입의 지역변수 초기화
+//
+//    // 기본 메시지 루프입니다:
+//    while (GetMessage(&msg, nullptr, 0, 0))
+//    {
+//        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+//        {
+//            TranslateMessage(&msg);
+//            DispatchMessage(&msg);
+//        }
+//    }
+//
+//
+//    OnDestroy();   //<--상속구조에 다형성을 이용한다
+//
+//    return msg;
+//}
 
 MSG CAPIEngine::Run()
 {
@@ -45,17 +71,24 @@ MSG CAPIEngine::Run()
 
     CPathMgr::GetInstance()->Create();
     CResourcesMgr::GetInstance()->Create(this);
-
+    
     mpBackBuffer = new CTexture();
     mpBackBuffer->CreateBackBuffer(hInst, mhDC);
 
     CInputMgr::GetInstance();
     CCollisionMgr::GetInstance();
 
+
+
+
+
+
     OnCreate();     //<--상속구조에 다형성을 이용한다
 
     MSG msg = { 0 };    //MSG구조체 타입의 지역변수 초기화
 
+
+        
     QueryPerformanceFrequency(&mTickPerSecond);         //초당 틱수 얻기 
     //현재 틱수를 얻는다
     QueryPerformanceCounter(&mTime);
@@ -97,10 +130,12 @@ MSG CAPIEngine::Run()
         }
     }
 
+
     OnDestroy();   //<--상속구조에 다형성을 이용한다
 
     CCollisionMgr::GetInstance()->ReleaseInstance();
     CInputMgr::GetInstance()->ReleaseInstance();
+
 
     if (nullptr != mpBackBuffer)
     {
@@ -111,10 +146,14 @@ MSG CAPIEngine::Run()
     CResourcesMgr::GetInstance()->ReleaseInstance();
     CPathMgr::GetInstance()->ReleaseInstance();
 
+
+
     ReleaseDC(mhWnd, mhDC);
     
+
     return msg;
 }
+
 
 void CAPIEngine::OnCreate()
 {
@@ -134,6 +173,8 @@ void CAPIEngine::OnUpdate(float tDeltaTime)
 
     //OutputDebugString(L"CAPIEngine::OnUpdate\n");
 
+
+
     //문자열
     //TextOut(mhDC, 0, 0, TEXT("Good Boy."), 9);
     //TextOut(mhDC, 0, 25, TEXT("0102345%$#ufoGHJ"), 16);
@@ -142,6 +183,7 @@ void CAPIEngine::OnUpdate(float tDeltaTime)
     //LPCWSTR tszwStr = L"한글판 visual studio community";
     //int tCount = lstrlenW(tszwStr);     //wide string에 글자 갯수 세기 함수
     //TextOut(mhDC, 0, 75, tszwStr, tCount);
+
 
     ////사각형
     //Rectangle(mhDC, 200, 200, 200 + 100, 200 + 50);
@@ -156,12 +198,14 @@ void CAPIEngine::OnUpdate(float tDeltaTime)
     //LineTo(mhDC, 500, 200);
     //LineTo(mhDC, 350, 200);
 
+
     ////타원
     //Ellipse(mhDC, 400, 100, 400 + 100, 100 + 50);
 
     ////원
     //Ellipse(mhDC, 0, 400, 0 + 100, 400 + 100);
 }
+
 
 void CAPIEngine::DrawCircle(float tX, float tY, float tRadius, float tR, float tG, float tB)
 {
@@ -221,6 +265,16 @@ void CAPIEngine::DrawRect(float tX, float tY, float tWidth, float tHeight, float
 
 void CAPIEngine::DrawTexture(float tX, float tY, CTexture* tpTexture, COLORREF tColorKey)
 {
+    //이제 후면버퍼에 그린다
+    /*BitBlt(this->mpBackBuffer->mhDCMem,
+        tX, tY,
+        tpTexture->mBitmapInfo.bmWidth, tpTexture->mBitmapInfo.bmHeight,
+
+        tpTexture->mhDCMem,
+        0, 0,
+        
+        SRCCOPY);*/
+
     TransparentBlt(this->mpBackBuffer->mhDCMem,
         tX, tY,
         tpTexture->mBitmapInfo.bmWidth, tpTexture->mBitmapInfo.bmHeight,
@@ -229,24 +283,24 @@ void CAPIEngine::DrawTexture(float tX, float tY, CTexture* tpTexture, COLORREF t
         0, 0,
         tpTexture->mBitmapInfo.bmWidth, tpTexture->mBitmapInfo.bmHeight,
 
-        tColorKey
-        );
+        tColorKey);
 }
 
 void CAPIEngine::DrawTexturePartial(float tX, float tY, CTexture* tpTexture, int tRow, int tCol, int tIndex, COLORREF tColorKey)
 {
     //스프라이트 시트 안에서 임의의 프레임의 너비, 높이
-    int tSrcWidth = tpTexture->mBitmapInfo.bmWidth / tCol;
-    int tSrcHeight = tpTexture->mBitmapInfo.bmHeight / tRow;
+    int tSrcWidth = tpTexture->mBitmapInfo.bmWidth/tCol;
+    int tSrcHeight = tpTexture->mBitmapInfo.bmHeight/tRow;
 
     //행, 열 단위의 좌표
-    int tCurCol = tIndex % tCol;
-    int tCurRow = tIndex / tCol;
+    int tCurCol = tIndex%tCol;
+    int tCurRow = tIndex/tCol;
 
-    //스프라이트 시트  안에서 임의의 프레임의 왼쪽 상단 위치
+    //스프라이트 시트 안에서 임의의 프레임의 왼쪽 상단 위치
     //픽셀 단위의 좌표
-    int tSrcX = tCurCol * tSrcWidth;
-    int tSrcY = tCurRow * tSrcHeight;
+    int tSrcX = tCurCol*tSrcWidth;
+    int tSrcY = tCurRow*tSrcHeight;
+
 
     TransparentBlt(this->mpBackBuffer->mhDCMem,
         tX, tY,
@@ -256,8 +310,7 @@ void CAPIEngine::DrawTexturePartial(float tX, float tY, CTexture* tpTexture, int
         tSrcX, tSrcY,
         tSrcWidth, tSrcHeight,
 
-        tColorKey
-    );
+        tColorKey);
 }
 
 /*
@@ -280,6 +333,9 @@ void CAPIEngine::Clear(float tR, float tG, float tB)
     //Rectangle(mhDC, 0, 0, tRect.right, tRect.bottom);
     //이제 후면버퍼에 그린다.
     //Rectangle(mpBackBuffer->mhDCMem, 0, 0, tRect.right, tRect.bottom);
+
+
+
 
     //step_1
     // GDI( Graphic Device Interace ) Object
@@ -321,6 +377,11 @@ void CAPIEngine::Present()
         0, 0,
         SRCCOPY);
 }
+
+
+
+
+
 
 ATOM CAPIEngine::MyRegisterClass(HINSTANCE hInstance)
 {
@@ -367,6 +428,8 @@ BOOL CAPIEngine::InitInstance(HINSTANCE hInstance, int nCmdShow)
     SetWindowPos(hWnd, HWND_TOPMOST, 0,0, tRect.right - tRect.left, tRect.bottom - tRect.top, 
         SWP_NOMOVE | SWP_NOZORDER) ;
 
+
+
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
@@ -393,6 +456,7 @@ LRESULT CALLBACK CAPIEngine::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPA
         OutputDebugString(L"------------------WM_TIMER Enemy DoFire!!----\n");
     }
     break;
+
 
     case WM_COMMAND:
     {
@@ -428,6 +492,7 @@ LRESULT CALLBACK CAPIEngine::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPA
         //int tCount = lstrlenW(tszwStr);     //wide string에 글자 갯수 세기 함수
         //TextOut(hdc, 0, 75, tszwStr, tCount);
 
+
         ////사각형
         //Rectangle(hdc, 200, 200, 200 + 100, 200 + 50);
 
@@ -441,11 +506,13 @@ LRESULT CALLBACK CAPIEngine::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPA
         //LineTo(hdc, 500, 200);
         //LineTo(hdc, 350, 200);
 
+
         ////타원
         //Ellipse(hdc, 400, 100, 400 + 100, 100 + 50);
 
         ////원
         //Ellipse(hdc, 0, 400, 0 + 100, 400 + 100);
+
 
         EndPaint(hWnd, &ps);            //DC를 해제
     }

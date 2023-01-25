@@ -20,6 +20,7 @@ bool CTexture::LoadTexture(HINSTANCE hInst, HDC hDC, LPCWSTR tFileName)
         return false;
     }
 
+
     mhBitmap = (HBITMAP)LoadImage(hInst, tFileName,
         IMAGE_BITMAP,
         0, 0,
@@ -30,6 +31,7 @@ bool CTexture::LoadTexture(HINSTANCE hInst, HDC hDC, LPCWSTR tFileName)
         return false;
     }
 
+
     mhOldBitmap = (HBITMAP)SelectObject(mhDCMem, mhBitmap);
 
     if (!mhOldBitmap)
@@ -38,7 +40,9 @@ bool CTexture::LoadTexture(HINSTANCE hInst, HDC hDC, LPCWSTR tFileName)
     }
 
     //비트맵 정보를 얻어오자
+    //mBitmapInfo;
     GetObject(mhBitmap, sizeof(mBitmapInfo), &mBitmapInfo);
+
 
 	return true;
 }

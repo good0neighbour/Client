@@ -41,6 +41,11 @@ CUnit::~CUnit()
 CUnit::CUnit(const CUnit& t)
 	:CObjectRyu(t)
 {
+	//mPosition = t.mPosition;
+	//CUnit::CUnit(t);
+	//CObjectRyu::CObjectRyu(t);
+	//mX = t.mX;
+	//mY = t.mY;
 	mRadius = t.mRadius;
 
 	mDisplayX = t.mDisplayX;
@@ -56,6 +61,8 @@ CUnit::CUnit(const CUnit& t)
 	mIsActive = t.mIsActive;
 	//얕은 복사
 	mpEngine = t.mpEngine;
+
+
 
 	//유닛마다 충돌체는 각자 가져야 하므로 '깊은 복사'를 수행해야 한다.
 	//얕은 복사
@@ -79,9 +86,12 @@ CUnit::CUnit(const CUnit& t)
 		(*mpAnimator) = (*t.mpAnimator);
 		mpAnimator->SetOwnerObject(this);
 	}
+
 }
 void CUnit::operator=(const CUnit& t)
 {
+	//mPosition = t.mPosition;
+	//CUnit::operator=(t);
 	CObjectRyu::operator=(t);
 
 	//mX = t.mX;
@@ -94,6 +104,7 @@ void CUnit::operator=(const CUnit& t)
 	mAnchorY = t.mAnchorY;
 	mWidth = t.mWidth;
 	mHeight = t.mHeight;
+
 
 	//얕은 복사
 	//비트맵 이미지 데이터는 shared resource(공유자원)로 다루겠다.
@@ -129,6 +140,7 @@ void CUnit::operator=(const CUnit& t)
 		mpAnimator->SetOwnerObject(this);
 	}
 }
+
 
 void CUnit::Create(CAPIEngine* tpEngine)
 {
@@ -175,6 +187,7 @@ void CUnit::Render()
 			mDisplayX = mPosition.mX - mWidth * mAnchorX;
 			mDisplayY = mPosition.mY - mHeight * mAnchorY;
 
+
 			mpAnimator->UpdateAnimation(mpEngine->GetDeltaTime());
 			mpAnimator->Render(mDisplayX, mDisplayY);
 		}
@@ -192,7 +205,28 @@ void CUnit::Render()
 			mpEngine->DrawTexture(mDisplayX, mDisplayY, mpTexture);
 		}
 
+
 		LateUpdate();
+
+
+		//DEBUG DRAW
+		//mpEngine->DrawCircle(mPosition.mX, mPosition.mY, mRadius);
+
+		//충돌체 랜더
+		//collider render
+		/*SVector2D tPosition = mpCollider->GetPosition();
+		float tWidth = mpCollider->GetWidth();
+		float tHeight = mpCollider->GetHeight();
+		float tAnchorX = mpCollider->GetAnchorX();
+		float tAnchorY = mpCollider->GetAnchorY();
+
+
+		mpEngine->DrawRect(
+			tPosition.mX - tWidth * tAnchorX,
+			tPosition.mY - tHeight * tAnchorY,
+			tWidth,
+			tHeight);*/
+
 	}
 }
 

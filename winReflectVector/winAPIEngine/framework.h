@@ -14,8 +14,9 @@
 #include <memory.h>
 #include <tchar.h>
 
-#include "CAPIEngine.h"
 
+
+#include "CAPIEngine.h"
 #include "CUnit.h"
 
 #include "CTexture.h"
@@ -24,12 +25,14 @@
 
 #include "CInputMgr.h"
 
+
 #include "CCollider.h"
 #include "CCollisionMgr.h"
 
 //test
 #include "CAniSeq.h"
 #include "CAnimator.h"
+
 
 #include "CPathMgr.h"
 #include "CResourcesMgr.h"

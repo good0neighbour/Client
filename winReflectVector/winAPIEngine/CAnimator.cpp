@@ -106,22 +106,23 @@ bool CAnimator::AddAniSeq(const string& tId, float tTimeInterval, int tTotalFram
 	tpAniSeq->mTimeInterval = tTimeInterval;
 	tpAniSeq->mTotalFrameCount = tTotalFrameCount;
 
+
 	tpAniSeq->mPlayOption = tPlayOption;
 
 	tpAniSeq->mSpriteOption = tSpriteOption;
 	tpAniSeq->mRow = tRow;
 	tpAniSeq->mCol = tCol;
 
-	//프레임 하나의 파일 하나가 가정된 경우는 이렇게 처리
+	//프레임 하나에 파일 하나 가 가정된 경우는 이렇게 처리
 	if (ANI_SO::FRAME_FILE == tSpriteOption)
 	{
 		//총 프레임 갯수만큼 프레임 정보를 생성하여 추가한다
 		for (int ti = 0; ti < tTotalFrameCount; ++ti)
 		{
 			/*CTexture* tpTex = nullptr;
-			tpTex = new CTexture();		
+			tpTex = new CTexture();
 			tpTex->AddRef();
-
+			
 			WCHAR szTemp[256] = { 0 };
 			wsprintf(szTemp, L"%s_%d.bmp", tpFileName, ti);
 
@@ -129,20 +130,20 @@ bool CAnimator::AddAniSeq(const string& tId, float tTimeInterval, int tTotalFram
 
 			tpAniSeq->mTexs.push_back(tpTex);*/
 
-			//기존 코드에는 자원 파일에서 로드하고 그 데이터에 접근하는 코드가 혼재되어 있었지만
-			// 이제는 접근하는 코드만 여기에 존재한다
-			// 자원을 파일에서 로드하는 부분은 프로그램 초기에 처리하고
-			// 여기서는 이제 자원관리자에 질의응 하여 원하는 자원을 얻는다
+			//기존 코드에는 자원 파일에서 로드하고 그 데이터에 접근하는 코드가 혼재되어 있었지만 
+			// 이제는 접근하는 코드만 여기에 존재한다.
+			// 자원을 파일에서 로드하는 부분은 프로그램 초기에 처리하고 
+			// 여기서는 이제 자원관리자에 질의를 하여 원하는 자원을 얻는다
 			//tId.c_str(), ti
 			char szTemp[256] = { 0 };
 			sprintf_s(szTemp, "%s_%d", tId.c_str(), ti);
 			string tString = szTemp;
 			tpAniSeq->mTexs.push_back(FIND_TEX(tString));
 
-			//임의의 프레임의 너비, 높이르 결정
-			tpAniSeq->mSpriteWidth = tpAniSeq->mTexs[0]->mBitmapInfo.bmWidth / tCol;
-			tpAniSeq->mSpriteHeight = tpAniSeq->mTexs[0]->mBitmapInfo.bmHeight / tRow;
-		}
+			//임의의 프레임의 너비, 높이를 결정
+			tpAniSeq->mSpriteWidth = tpAniSeq->mTexs[0]->mBitmapInfo.bmWidth / 1;
+			tpAniSeq->mSpriteHeight = tpAniSeq->mTexs[0]->mBitmapInfo.bmHeight / 1;
+		}		
 	}
 	//프레임 N개가 하나의 파일에 담긴 경우
 	else if (ANI_SO::SHEET_FILE == tSpriteOption)
@@ -150,20 +151,21 @@ bool CAnimator::AddAniSeq(const string& tId, float tTimeInterval, int tTotalFram
 		/*CTexture* tpTex = nullptr;
 		tpTex = new CTexture();
 		tpTex->AddRef();
-
+		
 		WCHAR szTemp[256] = { 0 };
 		wsprintf(szTemp, L"%s.bmp", tpFileName);
 
 		tpTex->LoadTexture(mpEngine->GetHInstance(), mpEngine->GetHDC(), szTemp);
 		tpAniSeq->mTexs.push_back(tpTex);*/
-		//기존 코드에는 자원 파일에서 로드하고 그 데이터에 접근하는 코드가 혼재되어 있었지만
-			// 이제는 접근하는 코드만 여기에 존재한다
-			// 자원을 파일에서 로드하는 부분은 프로그램 초기에 처리하고
-			// 여기서는 이제 자원관리자에 질의응 하여 원하는 자원을 얻는다
+		//기존 코드에는 자원 파일에서 로드하고 그 데이터에 접근하는 코드가 혼재되어 있었지만 
+			// 이제는 접근하는 코드만 여기에 존재한다.
+			// 자원을 파일에서 로드하는 부분은 프로그램 초기에 처리하고 
+			// 여기서는 이제 자원관리자에 질의를 하여 원하는 자원을 얻는다
 		tpAniSeq->mTexs.push_back(FIND_TEX(tId));
 
-		//임의의 프레임의 너비, 높이르 결정
-		tpAniSeq->mSpriteWidth = tpAniSeq->mTexs[0]->mBitmapInfo.bmWidth / tCol;
+
+		//임의의 프레임의 너비, 높이를 결정
+		tpAniSeq->mSpriteWidth = tpAniSeq->mTexs[0]->mBitmapInfo.bmWidth/tCol;
 		tpAniSeq->mSpriteHeight = tpAniSeq->mTexs[0]->mBitmapInfo.bmHeight / tRow;
 	}
 
@@ -178,6 +180,7 @@ void CAnimator::UpdateAnimation(float tDeltaTime)
 //mStrKeyCurAniSeq = "ani_idle_actor";
 	//mStrKeyCurAniSeq = "ani_super_actor";
 
+
 	unordered_map<string, CAniSeq*>::iterator tItor = mAniSeqs.find(mStrKeyCurAniSeq);
 
 	if (tItor != mAniSeqs.end())
@@ -187,7 +190,6 @@ void CAnimator::UpdateAnimation(float tDeltaTime)
 		mpCurAniSeq->Update(tDeltaTime);
 	}
 }
-
 void CAnimator::Render(float tX, float tY)
 {
 	if (!mpCurAniSeq)
@@ -195,7 +197,7 @@ void CAnimator::Render(float tX, float tY)
 		return;
 	}
 
-	//프레임 하나의 파일 하나가 가정된 경우는 이렇게 처리
+	//프레임 하나에 파일 하나 가 가정된 경우는 이렇게 처리
 	if (ANI_SO::FRAME_FILE == mpCurAniSeq->mSpriteOption)
 	{
 		//현재 애니메이션 시퀀스에
@@ -218,18 +220,17 @@ void CAnimator::Render(float tX, float tY)
 		int tIndex = mpCurAniSeq->mCurFrameIndex;
 		//임의의 현재 프레임  을 랜더한다
 		CTexture* tpTex = nullptr;
-		tpTex = mpCurAniSeq->mTexs[0];	//<-- 이미지는 한 장의 개념
+		tpTex = mpCurAniSeq->mTexs[0];		//<-- 이미지는 한 장의 개념
 
 		if (tpTex)
 		{
 			//mpEngine->DrawTexture(tX, tY, tpTex);
 			mpEngine->DrawTexturePartial(tX, tY, tpTex, mpCurAniSeq->mRow, mpCurAniSeq->mCol, tIndex);
-
-
 		}
 
 		LateUpdate();
 	}
+
 }
 
 void CAnimator::SetDefaultAniSeq(const string& tStrDefaultAniSeq)
@@ -239,12 +240,14 @@ void CAnimator::SetDefaultAniSeq(const string& tStrDefaultAniSeq)
 	//새로 플레이할 애니메이션 시퀀스를 설정한다
 	mStrKeyCurAniSeq = tStrDefaultAniSeq;
 
+
 	unordered_map<string, CAniSeq*>::iterator tItor = mAniSeqs.find(mStrKeyCurAniSeq);
 
 	if (tItor != mAniSeqs.end())
 	{
 		mpCurAniSeq = tItor->second;
 	}
+
 
 	if (mpCurAniSeq)
 	{
@@ -253,7 +256,6 @@ void CAnimator::SetDefaultAniSeq(const string& tStrDefaultAniSeq)
 		mpCurAniSeq->mAniTime = 0.0f;
 	}
 }
-
 void CAnimator::PlayAni(const string& tStrAniSeq)
 {
 	//현재 플레이 중인 애니메이션 시퀀스를 기억시켜 둔다
@@ -269,7 +271,6 @@ void CAnimator::PlayAni(const string& tStrAniSeq)
 		mpCurAniSeq->mAniTime = 0.0f;
 	}
 }
-
 void CAnimator::LateUpdate()
 {
 	//애니메이션 시퀀스 플레이 옵션에 따라서 분기
@@ -304,11 +305,11 @@ void CAnimator::LateUpdate()
 	}
 }
 
+
 void CAnimator::Create(CAPIEngine* tpEngine)
 {
 	mpEngine = tpEngine;
 }
-
 void CAnimator::Destroy()
 {
 

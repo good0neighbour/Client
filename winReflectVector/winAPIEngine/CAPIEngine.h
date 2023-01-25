@@ -10,7 +10,11 @@
 //TransparentBlt함수의 정의를 링킹시키기 위해 필요
 #pragma comment(lib, "msimg32.lib")
 
+
+
+
 #define MAX_LOADSTRING 100
+
 
 class CTexture;
 
@@ -29,6 +33,7 @@ public:
 	BOOL Create(HINSTANCE hInstance, int nCmdShow);
 	MSG Run();
 
+
 	virtual void OnCreate();
 	virtual void OnDestroy();
 	virtual void OnUpdate(float tDeltaTime);
@@ -38,9 +43,10 @@ public:
 	void DrawRect(float tX, float tY, float tWidth,float tHeight, float tR = 1.0f, float tG = 0.0f, float tB = 0.0f);
 	//비트맵 이미지 그리기 함수
 	//투명 컬러키로 하얀색을 지정, 매개변수 기본값 문법을 이용
-	void DrawTexture(float tX, float tY, CTexture* tpTexture, COLORREF tColorKey = RGB(255, 0, 255));
+	void DrawTexture(float tX, float tY, CTexture* tpTexture, COLORREF tColorKey = RGB(255,0,255));
 
-	void DrawTexturePartial(float tX, float tY, CTexture* tpTexture, int tRow, int tCol, int tIndex, COLORREF tColorKey = RGB(255, 0, 255));
+	void DrawTexturePartial(float tX, float tY, CTexture* tpTexture,int tRow, int tCol, int tIndex, COLORREF tColorKey = RGB(255, 0, 255));
+
 
 	//정규화: 크기를 1로 만들어 다루는 개념
 	// [0,1] <--폐구간 0에서 1사이의 수치(0과 1 포함)
@@ -49,6 +55,7 @@ public:
 	void Clear(float tR = 0.0f, float tG = 0.0f, float tB= 0.0f);
 	//프레임 화면 제출 함수
 	void Present();
+
 
 	//원본객체 생성 함수
 	//CreatePrefab에서는 임의의 원본객체를 생성하기 위해 
@@ -80,6 +87,7 @@ public:
 		SAFE_DELETE(tPrefab)
 	}
 
+
 	//실제 객체 생성 함수
 	template<typename T>
 	T* InstantObject(CUnit* tpPrefab)
@@ -96,6 +104,7 @@ public:
 		//모든 유닛들을 충돌관리자에 생성시 등록하도록 함
 		CCollisionMgr::GetInstance()->AddUnit(tpUnit);
 
+
 		return tpUnit;
 	}
 
@@ -108,6 +117,9 @@ public:
 		SAFE_RELEASE(tUnit)
 	}
 
+
+
+
 protected:
 	ATOM MyRegisterClass(HINSTANCE hInstance);
 
@@ -115,22 +127,27 @@ protected:
 	static LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 	static INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
+
 protected:
 	HINSTANCE hInst;                                // 현재 인스턴스입니다.
 	
 	WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 	WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
+
 	HDC mhDC;			//현재 화면 DC(의 핸들)
 	HWND mhWnd;		//윈도우 핸들
 
+
 	CTexture* mpBackBuffer = nullptr;
+
 
 private:
 	LARGE_INTEGER mTickPerSecond;	//초당 틱수
 	LARGE_INTEGER mTime;				//임의의 시점에 틱수
 
 	float mDeltaTime;		//한 프레임에 걸린 시간
+
 
 public:
 	HINSTANCE GetHInstance()

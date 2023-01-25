@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "ryumacro.h"
 
 //추가, 삭제에 유리한 자료구조를 선택
