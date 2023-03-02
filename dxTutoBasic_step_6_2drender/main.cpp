@@ -15,13 +15,69 @@
     3d 기반의 2d 랜더링하기
     <-- 2d UI, 2d Sprite, text rendering
 
+
     i) 직교 투영 orthographic projection
 
         perspective projection 원근투영 vs orthographic projection 직교투영
 
+
     ii) Depth Buffer( Z Buffer ) 해제
 
+
     iii) 동적 정점 버퍼 Dynamic Vertex Buffer를 이용
+
+
+        가) vertex buffer
+            우리가 지금 정적 버퍼vertex buffer를 이용하고 있는 방법
+
+            응용프로그램 수준에서 데이터를 만들고 IA에 입력한다.
+            (<-- 그러면 GPU는 CPU의 간섭을 받지 않고 해당 데이터vertex buffer를 이용하여 랜더링한다.
+            이렇게 하는 이유는, 전체적인 랜더링 파이프라인관점에서 보면 CPU의 간섭이 있을 시 전체 랜더링 속도가 느려지기 때문이다.
+            왜냐하면, CPU와 GPU는 처리 속도가 다르기 때문이다.)
+
+            한번 만든 데이터는 바뀌지 않는다
+
+        ------------------------------------------------------------
+        CPU                             GPU
+        ------------------------------------------------------------
+        시스템 메모리     --->        --IA에 전달 --> vertex biffer
+        ------------------------------------------------------------
+
+        나) constant buffer
+
+            UpdateSubresource 함수를 이용하여 업데이트한다
+            한 프레임당 한 번씩 갱신되어야 하는 자원들을 위해 만들어진 구조다.
+            상수버퍼 자체는 바뀌지 않는다. 값이 갱신되는 것이다.
+
+        ------------------------------------------------------------
+        CPU                                                          GPU
+        ------------------------------------------------------------
+        시스템 메모리     시스템 메모리(상수버퍼용)      --->        상수버퍼
+        ------------------------------------------------------------
+
+
+
+        vs
+
+        Dynamic Buffer옵션으로 설정한 vertex buffer
+
+        :CPU가 직접 데이터를 그래픽 처리 장치에 써넣는다. 그렇게 하기위한 구조가 제공된다.
+        Map/ UnMap 을 사용하여 데이터를 갱신한다.
+
+        <-- 정점 버퍼의 데이터의 값이
+        응용프로그램 수준에서
+        지속적으로 끊임없이 갱신(변경)되어야 하는 경우를 위해서 이런 옵션이 존재한다
+        예) 스프라이트 애니메이션의 경우 정점 버퍼의 uv좌표 정보가 계속 변경되어야만 한다.
+
+
+        ------------------------------------------------------------
+        CPU                                                          GPU
+        ------------------------------------------------------------
+        시스템 메모리     --> mapResources    --->    직접데이터갱신 vertex buffer
+        ------------------------------------------------------------
+
+        그러므로, 당연히 IA에 설정하여 렌더링하도록 만들어진 vertex buffer 보다는 기본적으로 느리다
+        하지만, 성능상 붙이기 없도록 옵션이 존재한다.
 */
 
 
@@ -151,7 +207,7 @@ public:
 
         //mMatProjection = XMMatrixPerspectiveFovLH(XM_PIDIV2, (float)tWidth / (float)tHeight, 0.01f, 100.0f);
 
-        //직교 투영 변환 행렬 만들기
+        //직교 퉁영 변환 행렬 만들기 
         mMatProjection = XMMatrixIdentity();
 
         RECT rc = { 0 };
@@ -159,13 +215,12 @@ public:
         unsigned int tWidth = rc.right - rc.left;
         unsigned int tHeight = rc.bottom - rc.top;//윈도우 좌표계 상에서 계산
 
-        //픽셀당 유닛
+        //픽셀 당 유닛 
         //float tPixelPerUnit = 1.0f;
         float tPixelPerUnit = 0.05f;
-        //1유닛당 몇 개의 픽셀이 들어있는가?
+        //1유닛당 몇개의 픽셀이 들어있는가?
 
-        mMatProjection = XMMatrixOrthographicLH(tPixelPerUnit * tWidth, tPixelPerUnit * tHeight, 0.01f, 100.0f);
-
+        mMatProjection = XMMatrixOrthographicLH(tPixelPerUnit*tWidth, tPixelPerUnit * tHeight, 0.01f, 100.0f);
     }
     virtual void OnDestroy() override
     {        
@@ -291,6 +346,16 @@ public:
         mpMesh->Render();
         mpMtlTexture->Render(mpMesh->GetCountIndex(), mpMesh->GetTexture());
 
+        //================================
+        // 2D render 모드를 위해, 깊이버퍼를 끈다
+        mpD3D->DoTurnOffDepthBuffer();
+
+
+
+
+        // 2D render 모드를 위해, 깊이버퍼를 켠다
+        mpD3D->DoTurnOnDepthBuffer();
+        //================================
 
                 
         this->Present();

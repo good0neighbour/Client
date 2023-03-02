@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CBitmapRect.h" />
     <ClInclude Include="CD3D.h" />
     <ClInclude Include="CDxEngine.h" />
     <ClInclude Include="CMesh.h" />
@@ -138,6 +139,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CBitmapRect.cpp" />
     <ClCompile Include="CD3D.cpp" />
     <ClCompile Include="CDxEngine.cpp" />
     <ClCompile Include="CMesh.cpp" />

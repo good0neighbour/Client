@@ -245,6 +245,17 @@ HRESULT CD3D::Create(HWND thWnd)
 
 
 
+    //활성, 비활성 상태에 대한 설명
+    D3D11_DEPTH_STENCIL_DESC depthEnableDesc;
+    D3D11_DEPTH_STENCIL_DESC depthDisableDesc;
+
+    ZeroMemory(&depthEnableDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));//메모리에 0으로 세팅
+    depthEnableDesc.DepthEnable = true;
+    mpd3dDevice->CreateDepthStencilState(&depthEnableDesc, &mpDepthEnableState);
+
+    ZeroMemory(&depthDisableDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));//메모리에 0으로 세팅
+    depthDisableDesc.DepthEnable = false;
+    mpd3dDevice->CreateDepthStencilState(&depthDisableDesc, &mpDepthDisableState);
 
 
 
@@ -304,4 +315,16 @@ void CD3D::Clear(XMVECTORF32 tColor)
 void CD3D::Present()
 {
     mpSwapChain->Present(0, 0);
+}
+
+
+
+void CD3D::DoTurnOnDepthBuffer()
+{
+    mpImmediateContext->OMSetDepthStencilState(mpDepthEnableState, 1);
+}
+void CD3D::DoTurnOffDepthBuffer()
+{
+    mpImmediateContext->OMSetDepthStencilState(mpDepthDisableState, 1);
+
 }

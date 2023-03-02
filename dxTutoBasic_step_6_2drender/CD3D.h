@@ -23,6 +23,10 @@ public:
 	ID3D11Texture2D* mpDepthStencil = nullptr;
 	ID3D11DepthStencilView* mpDepthStencilView = nullptr;
 
+	//깊이버퍼의 상태를 조정하기 위한 변수
+	ID3D11DepthStencilState* mpDepthEnableState = nullptr;	//깊이버퍼 활성 상태
+	ID3D11DepthStencilState* mpDepthDisableState = nullptr;	//깊이버퍼 비활성 상태
+
 
 	HWND mhWnd;		//윈도우 핸들
 
@@ -43,5 +47,9 @@ public:
 	{
 		return mpImmediateContext;
 	}
+
+	//깊이버터 상태 조정 함수
+	void DoTurnOnDepthBuffer();
+	void DoTurnOffDepthBuffer();
 };
 
