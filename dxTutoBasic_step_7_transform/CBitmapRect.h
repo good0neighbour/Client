@@ -4,15 +4,11 @@
 #include <vector>
 
 /*
-    CBitmapRect는 기본적으로 CBitmapRect와 같다.
+    이동 코드 작성을 위해
 
-    이것은 '사각형'에 텍스쳐를 매핑하여
-    2D를 모사하는 것이다.
+    지금까지의 코드를 잠깐 정리하자.
 
-    기본적으로 CBitmapRect와 같고
-    거기에 Dynamic Buffer를 이용하여
-    vertex buffer의 데이터를
-    Map/Unmap을 이용하여 갱신하도록 하겠다
+    <-- 상수버퍼를 용도별로 분류하자
 */
 
 using namespace std;

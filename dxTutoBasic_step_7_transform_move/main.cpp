@@ -14,19 +14,13 @@
 #include "CMtlUnlit.h"
 
 /*
-    3d 기반의 2d 랜더링하기
-    <-- 2d UI, 2d Sprite, text rendering
+    게임 오브젝트의 이동을 만들어보자
 
-        2D 코드 정리
-        
-        i) CMtlUnlit
+    i) 게임 모브젝트 개념으로 다음 클래스를 만들자
 
-            2d ui material 개념을 만들겠다.
+        CActor
 
-            -Material 클래스 만들기
-            -vertex shader, pixel shader도 만들기
-
-        ii) 3D는 원근투영보드로 적용
+    ii) 월드 상에서 게임 오브젝트가 이동하는 것을 만들자.
 */
 
 
@@ -44,7 +38,8 @@ class CRyuEngine : public CDxEngine
 
     
     //상수 버퍼( 변환행렬 용 )
-    ID3D11Buffer* mpCBTransform = nullptr;
+    ID3D11Buffer* mpCBTransform = nullptr;  //transform 용 상수버퍼
+    ID3D11Buffer* mpCBLight = nullptr;      //light 용 상수버퍼
 
     //응용프로그램 수준에서 다룰 변환행렬들
     XMMATRIX mMatWorld_0;            //월드변환 행렬 <--- 첫번째 정육면체 용
@@ -126,13 +121,16 @@ public:
         tBd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;//constant buffer용도다
         tBd.CPUAccessFlags = 0;     //CPU의 접근은 불허한다
 
-        //부설명 은 필요없다. 
-        // UpdateSubResources을 이용하여 매 프레임마다 데이터의 값을 갱신할 것이기 때문이다.
-        // 
-        //D3D11_SUBRESOURCE_DATA InitData = {};
-        //InitData.pSysMem = tVertices;       //해당 시스템 메모리의 데이터의 내용을 넘겨준다
-
         mpD3D->GetD3DDevice()->CreateBuffer(&tBd, nullptr, &mpCBTransform);
+
+
+        D3D11_BUFFER_DESC tBdLight = {};
+        tBdLight.Usage = D3D11_USAGE_DEFAULT;            //기본용도다 
+        tBdLight.ByteWidth = sizeof(CBLight) * 1;    //해당 상수버퍼의 메모리 크기를 알린다
+        tBdLight.BindFlags = D3D11_BIND_CONSTANT_BUFFER;//constant buffer용도다
+        tBdLight.CPUAccessFlags = 0;     //CPU의 접근은 불허한다
+
+        mpD3D->GetD3DDevice()->CreateBuffer(&tBdLight, nullptr, &mpCBLight);
 
 
 
@@ -198,6 +196,21 @@ public:
     }
     virtual void OnDestroy() override
     {
+        if (mpCBLight)
+        {
+            mpCBLight->Release();
+        }
+
+        if (mpCBTransform)
+        {
+            mpCBTransform->Release();
+        }
+
+
+
+
+
+
 
         if (mpMtlUnlit)
         {
@@ -276,29 +289,43 @@ public:
         XMFLOAT4 tSpecularColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);//rgba
         float tPower = 20.0f;//1.0f;//8.0f;
 
+
+
         this->Clear(Colors::DarkOrchid);
 
       
-        mpD3D->GetImmediateDevice()->VSSetConstantBuffers(0, 1, &mpCBTransform);
-        mpD3D->GetImmediateDevice()->PSSetConstantBuffers(0, 1, &mpCBTransform);
+        mpD3D->GetImmediateDevice()->VSSetConstantBuffers(0, 1, &mpCBTransform);    //<-- transform용 상수버퍼 slot index 0
+        mpD3D->GetImmediateDevice()->VSSetConstantBuffers(1, 1, &mpCBLight);    //<-- light용 상수버퍼 slot index 1
 
-        CBTransform tCB;
-        tCB.mWorld = XMMatrixTranspose(mMatWorld_0);
-        tCB.mView = XMMatrixTranspose(mMatView);
-        tCB.mProjection = XMMatrixTranspose(mMatPerspective);
+        //mpD3D->GetImmediateDevice()->PSSetConstantBuffers(0, 1, &mpCBTransform);
+        mpD3D->GetImmediateDevice()->PSSetConstantBuffers(1, 1, &mpCBLight);    //<-- light용 상수버퍼 slot index 1
+
+
+
+
+
+
+        CBTransform tCBTransform;   //transfrom 용 상수버퍼 데이터 지역변수
+        CBLight tCBLight;           //light 용 상수버퍼 데이터 지역변수
+
+        tCBTransform.mWorld = XMMatrixTranspose(mMatWorld_0);
+        tCBTransform.mView = XMMatrixTranspose(mMatView);
+        tCBTransform.mProjection = XMMatrixTranspose(mMatPerspective);
+
         //빛 정보를 상수버퍼를 매개로 셰이더 측에 전달하기 위해 설정
         //난반사광 관련 정보 전달 
-        tCB.mLightDir = tLightDir;
-        tCB.mLightColor = tLightColor;
+        tCBLight.mLightDir = tLightDir;
+        tCBLight.mLightColor = tLightColor;
         //주변광 관련 정보 전달
-        tCB.mAmbientColor = tAmbientColor;
+        tCBLight.mAmbientColor = tAmbientColor;
         //정반사광 관련 정보 전달
-        tCB.mCameraPosition = mCameraPosition;
-        tCB.mSpecularColor = tSpecularColor;
-        tCB.mSpecularPower = tPower;
+        tCBLight.mCameraPosition = mCameraPosition;
+        tCBLight.mSpecularColor = tSpecularColor;
+        tCBLight.mSpecularPower = tPower;
         
         //셰이더 측에 상수버퍼에 값 갱신
-        mpD3D->GetImmediateDevice()->UpdateSubresource(mpCBTransform, 0, nullptr, &tCB, 0, 0);
+        mpD3D->GetImmediateDevice()->UpdateSubresource(mpCBTransform, 0, nullptr, &tCBTransform, 0, 0);
+        mpD3D->GetImmediateDevice()->UpdateSubresource(mpCBLight, 0, nullptr, &tCBLight, 0, 0);
 
 
         mpMesh->Render();
@@ -311,22 +338,24 @@ public:
             //단위행렬
             XMMATRIX tMatWorldBitmap = XMMatrixIdentity();
 
-            CBTransform tCBBitmap;
-            tCBBitmap.mWorld = XMMatrixTranspose(tMatWorldBitmap);
-            tCBBitmap.mView = XMMatrixTranspose(mMatView);
-            tCBBitmap.mProjection = XMMatrixTranspose(mMatOrthographic);
-            //난반사광 관련 정보 전달 
-            tCBBitmap.mLightDir = tLightDir;
-            tCBBitmap.mLightColor = tLightColor;
-            //주변광 관련 정보 전달
-            tCBBitmap.mAmbientColor = tAmbientColor;
-            //정반사광 관련 정보 전달
-            tCBBitmap.mCameraPosition = mCameraPosition;
-            tCBBitmap.mSpecularColor = tSpecularColor;
-            tCBBitmap.mSpecularPower = tPower;
+            CBTransform tCBBitmapTransform;
+            CBLight tCBBitmapLight;
+
+            tCBBitmapTransform.mWorld = XMMatrixTranspose(tMatWorldBitmap);
+            tCBBitmapTransform.mView = XMMatrixTranspose(mMatView);
+            tCBBitmapTransform.mProjection = XMMatrixTranspose(mMatOrthographic);
+            ////난반사광 관련 정보 전달 
+            //tCBBitmapLight.mLightDir = tLightDir;
+            //tCBBitmapLight.mLightColor = tLightColor;
+            ////주변광 관련 정보 전달
+            //tCBBitmapLight.mAmbientColor = tAmbientColor;
+            ////정반사광 관련 정보 전달
+            //tCBBitmapLight.mCameraPosition = mCameraPosition;
+            //tCBBitmapLight.mSpecularColor = tSpecularColor;
+            //tCBBitmapLight.mSpecularPower = tPower;
 
             //셰이더 측에 상수버퍼에 값 갱신
-            mpD3D->GetImmediateDevice()->UpdateSubresource(mpCBTransform, 0, nullptr, &tCBBitmap, 0, 0);
+            mpD3D->GetImmediateDevice()->UpdateSubresource(mpCBTransform, 0, nullptr, &tCBBitmapTransform, 0, 0);
 
 
             mpBitmap->Render(400.0f - 64, 300.0f + 32);
